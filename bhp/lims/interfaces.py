@@ -2,7 +2,7 @@
 #
 # Copyright 2018 Botswana Harvard Partnership (BHP)
 
-from bika.health.interfaces import IBikaHealth
+from bika.lims.interfaces import IBikaLIMS
 
 
 class IBhpLIMS(IBikaHealth):
