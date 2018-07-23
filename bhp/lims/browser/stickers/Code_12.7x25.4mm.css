@@ -1,0 +1,35 @@
+/*
+Sticker Dimensions: 25.4mm x 12.7mm
+Sticker margins: 1mm
+*/
+.sticker {
+    margin:0 auto;
+    padding:2mm 1mm;
+    width: 23.4mm;
+    height: 10.7mm;
+    font-family: Helvetica, Arial;
+    font-size:7pt;
+}
+
+.sticker .barcode {
+    margin: 0 0 0 -3.5mm !important;
+    margin: 0 auto;
+    padding: 0 !important;
+    text-align:center;
+}
+
+.sticker .barcode-hri {
+    font-size:7pt;
+}
+
+@media print {
+    @page {
+        size:  25.4mm 12.7mm !important;
+        margin: 0mm !important;
+    }
+    html, body {
+        height: 12.7mm !important;
+        width: 25.4mm !important;
+        margin: 0mm !important;
+    }
+}

@@ -1,0 +1,4 @@
+<layers>
+  <layer name="bhp.lims"
+         interface="bhp.lims.interfaces.IBhpLIMS" />
+</layers>
