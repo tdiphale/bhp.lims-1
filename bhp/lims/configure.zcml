@@ -23,7 +23,7 @@
       name="default"
       title="BHP LIMS"
       directory="profiles/default"
-      description='BHP LIMS extension profile for SENAITE Health'
+      description='BHP LIMS extension profile for SENAITE'
       provides="Products.GenericSetup.interfaces.EXTENSION"/>
 
   <!-- Run Setup Script -->
