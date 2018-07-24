@@ -99,7 +99,7 @@ def hide_unused_ar_fields(portal):
     AR_CONFIGURATION_STORAGE = "bika.lims.browser.analysisrequest.manage.add"
     storage = annotation.get(AR_CONFIGURATION_STORAGE, OOBTree())
 
-    visibility = storage.get('visibility', {})
+    visibility = storage.get('visibility', {}).copy()
     for field_name in field_names_to_hide:
         visibility[field_name] = False
     storage.update({"visibility": visibility})
