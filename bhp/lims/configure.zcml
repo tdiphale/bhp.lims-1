@@ -15,6 +15,7 @@
   <cmf:registerDirectory name="skins" directory="skins" recursive="True"/>
 
   <!-- Package includes -->
+  <include package=".content"/>
   <include package=".browser"/>
   <include package=".setupdata"/>
 

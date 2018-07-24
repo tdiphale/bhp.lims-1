@@ -28,6 +28,9 @@ def setupHandler(context):
     # Hide unused AR Fields
     hide_unused_ar_fields(portal)
 
+    # Sort AR fields (AR Add)
+    sort_ar_fields(portal)
+
 
     logger.info("BHP setup handler [DONE]")
 
@@ -80,7 +83,7 @@ def setup_id_formatting(portal):
 
 
 def hide_unused_ar_fields(portal):
-    """HIdes unused fields from AR Add Form
+    """Hides unused fields from AR Add Form
     """
     logger.info("*** Hiding default fields from AR Add ***")
     field_names_to_hide = ["AdHoc", "Batch", "CCContact", "CCEmails",
@@ -104,3 +107,24 @@ def hide_unused_ar_fields(portal):
         visibility[field_name] = False
     storage.update({"visibility": visibility})
     annotation[AR_CONFIGURATION_STORAGE] = storage
+
+def sort_ar_fields(portal):
+    """Sort AR fields from AR Add Form
+    """
+    logger.info("*** Sorting fields from AR Add ***")
+    sorted=['Client', 'Contact', 'ParticipantID', 'OtherParticipantReference',
+            'ParticipantInitials', 'Gender', 'Visit', 'DateOfBirth', 'Fasting',
+            'DateSampled', 'SampleType', 'Volume', 'Profiles', 'OtherInformation',
+            '_ARAttachment', 'CCContact', 'CCEmails', 'Sample', 'Batch',
+            'SamplingRound', 'SubGroup', 'Template', 'Sampler', 'SamplingDate',
+            'Specification', 'SamplePoint', 'StorageLocation',
+            'ClientOrderNumber', 'ClientReference', 'ClientSampleID',
+            'SamplingDeviation', 'SampleCondition', 'Priority',
+            'EnvironmentalConditions', 'DefaultContainerType', 'AdHoc',
+            'Composite', 'InvoiceExclude', 'PreparationWorkflow']
+
+    bika_setup = portal.bika_setup
+    annotation = IAnnotations(bika_setup)
+    AR_CONFIGURATION_STORAGE = "bika.lims.browser.analysisrequest.manage.add"
+    storage = annotation.get(AR_CONFIGURATION_STORAGE, OOBTree())
+    storage.update({"order": sorted})
