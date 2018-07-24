@@ -4,7 +4,8 @@
 
 from bhp.lims import logger
 from bhp.lims import bhpMessageFactory as _
-from bhp.lims.config import PRODUCT_NAME
+from BTrees.OOBTree import OOBTree
+from zope.annotation.interfaces import IAnnotations
 
 
 def setupHandler(context):
@@ -19,14 +20,19 @@ def setupHandler(context):
     portal = context.getSite()
 
     # Run installers
-    setupLaboratory(portal)
-    setupIDFormatting(portal)
+    setup_laboratory(portal)
+
+    # Apply ID format to content types
+    setup_id_formatting(portal)
+
+    # Hide unused AR Fields
+    hide_unused_ar_fields(portal)
 
 
     logger.info("BHP setup handler [DONE]")
 
 
-def setupLaboratory(portal):
+def setup_laboratory(portal):
     """Setup Laboratory
     """
     logger.info("*** Setup Laboratory ***")
@@ -35,7 +41,7 @@ def setupLaboratory(portal):
     lab.reindexObject()
 
 
-def setupIDFormatting(portal):
+def setup_id_formatting(portal):
     """Setup default ID formatting
     """
     logger.info("*** Setup ID Formatting ***")
@@ -56,14 +62,6 @@ def setupIDFormatting(portal):
         ids.append(format)
         bs.setIDFormatting(ids)
 
-    # Patient ID format
-    set_format(dict(form='P{seq:08d}',
-                    portal_type='Patient',
-                    prefix='patient',
-                    sequence_type='generated',
-                    split_length=1,
-                    value=''))
-
     # Sample ID format
     set_format(dict(form='{seq:06d}',
                     portal_type='Sample',
@@ -79,3 +77,30 @@ def setupIDFormatting(portal):
                     counter_type='backreference',
                     sequence_type='counter',
                     value=''))
+
+
+def hide_unused_ar_fields(portal):
+    """HIdes unused fields from AR Add Form
+    """
+    logger.info("*** Hiding default fields from AR Add ***")
+    field_names_to_hide = ["AdHoc", "Batch", "CCContact", "CCEmails",
+                           "ClientOrderNumber", "ClientReference",
+                           "ClientSampleID", "Composite", "Contact",
+                           "DateSampled", "DefaultContainerType",
+                           "EnvironmentalConditions", "InvoiceExclude",
+                           "PreparationWorkflow", "Priority", "Sample",
+                           "SampleCondition", "SamplePoint", "Sampler",
+                           "SamplingDate", "SamplingDeviation", "SamplingRound",
+                           "Specification", "StorageLocation", "SubGroup",
+                           "Template",]
+
+    bika_setup = portal.bika_setup
+    annotation = IAnnotations(bika_setup)
+    AR_CONFIGURATION_STORAGE = "bika.lims.browser.analysisrequest.manage.add"
+    storage = annotation.get(AR_CONFIGURATION_STORAGE, OOBTree())
+
+    visibility = storage.get('visibility', {})
+    for field_name in field_names_to_hide:
+        visibility[field_name] = False
+    storage.update({"visibility": visibility})
+    annotation[AR_CONFIGURATION_STORAGE] = storage
