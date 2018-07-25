@@ -9,27 +9,26 @@ from Products.Archetypes.public import TextAreaWidget
 from archetypes.schemaextender.interfaces import IOrderableSchemaExtender
 from bhp.lims.config import GENDERS
 from bika.lims import bikaMessageFactory as _
-from bika.lims.browser.fields.proxyfield import ExtProxyField
 from bika.lims.browser.widgets import DateTimeWidget
 from bika.lims.browser.widgets import SelectionWidget
-from bika.lims.interfaces import IAnalysisRequest
+from bika.lims.fields import ExtBooleanField, ExtDateTimeField
+from bika.lims.fields import ExtStringField
+from bika.lims.fields import ExtTextField
+from bika.lims.interfaces import ISample
 from zope.component import adapts
 from zope.interface import implements
 
 
-class AnalysisRequestSchemaExtender(object):
-    adapts(IAnalysisRequest)
+class SampleSchemaExtender(object):
+    adapts(ISample)
     implements(IOrderableSchemaExtender)
 
     def __init__(self, context):
         self.context = context
 
-
     fields = [
-        ExtProxyField(
+        ExtStringField(
             "ParticipantID",
-            proxy="context.getSample()",
-            mode="rw",
             required=1,
             widget=StringWidget(
                 label=_("Participant ID"),
@@ -43,10 +42,8 @@ class AnalysisRequestSchemaExtender(object):
             )
         ),
 
-        ExtProxyField(
+        ExtStringField(
             "OtherParticipantReference",
-            proxy="context.getSample()",
-            mode="rw",
             required=1,
             widget=StringWidget(
                 label=_("Other Participant Ref"),
@@ -60,10 +57,8 @@ class AnalysisRequestSchemaExtender(object):
             )
         ),
 
-        ExtProxyField(
+        ExtStringField(
             "ParticipantInitials",
-            proxy="context.getSample()",
-            mode="rw",
             required=1,
             widget=StringWidget(
                 label=_("Participant Initials"),
@@ -77,12 +72,10 @@ class AnalysisRequestSchemaExtender(object):
             )
         ),
 
-        ExtProxyField(
+        ExtStringField(
             "Gender",
-            proxy="context.getSample()",
-            mode="rw",
             required=1,
-            vocabulary= GENDERS,
+            vocabulary=GENDERS,
             widget=SelectionWidget(
                 format="radio",
                 label=_("Gender"),
@@ -94,10 +87,8 @@ class AnalysisRequestSchemaExtender(object):
             )
         ),
 
-        ExtProxyField(
+        ExtStringField(
             "Visit",
-            proxy="context.getSample()",
-            mode="rw",
             required=1,
             widget=StringWidget(
                 label=_("Visit Number"),
@@ -111,10 +102,8 @@ class AnalysisRequestSchemaExtender(object):
             )
         ),
 
-        ExtProxyField(
+        ExtBooleanField(
             "Fasting",
-            proxy="context.getSample()",
-            mode="rw",
             required=1,
             default=False,
             widget=BooleanWidget(
@@ -128,10 +117,8 @@ class AnalysisRequestSchemaExtender(object):
             ),
         ),
 
-        ExtProxyField(
+        ExtDateTimeField(
             'DateOfBirth',
-            proxy="context.getSample()",
-            mode="rw",
             required=1,
             widget=DateTimeWidget(
                 label=_('Date of Birth'),
@@ -145,10 +132,8 @@ class AnalysisRequestSchemaExtender(object):
             ),
         ),
 
-        ExtProxyField(
+        ExtStringField(
             "Volume",
-            proxy="context.getSample()",
-            mode="rw",
             required=1,
             widget=StringWidget(
                 label=_("Volume"),
@@ -162,10 +147,8 @@ class AnalysisRequestSchemaExtender(object):
             )
         ),
 
-        ExtProxyField(
+        ExtTextField(
             "OtherInformation",
-            proxy="context.getSample()",
-            mode="rw",
             default_content_type="text/plain",
             allowable_content_types=("text/plain",),
             default_output_type="text/plain",
@@ -179,6 +162,7 @@ class AnalysisRequestSchemaExtender(object):
             ),
         ),
     ]
+
 
     def getOrder(self, schematas):
         return schematas

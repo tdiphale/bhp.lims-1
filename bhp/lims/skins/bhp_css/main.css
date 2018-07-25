@@ -1,0 +1,10 @@
+.bika-listing-table .state-sample_ordered,
+.bika-listing-table .state-sample_ordered a {
+    background-color: #efefef !important;
+    color: #888 !important;
+}
+body.userrole-client .bika-listing-table .state-sample_ordered,
+body.userrole-client .bika-listing-table .state-sample_ordered a {
+    background-color: #F8DAFB !important;
+    color: #000 !important;
+}

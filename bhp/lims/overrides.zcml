@@ -1,0 +1,61 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="bhp">
+
+  <configure package="Products.CMFPlone.browser">
+      <include package="z3c.unconfigure" file="meta.zcml" />
+      <unconfigure>
+          <!-- Main Analysis Requests View -->
+          <browser:page
+              for="bika.lims.interfaces.IAnalysisRequestsFolder"
+              name="base_view"
+              class="bika.lims.browser.analysisrequest.analysisrequests.AnalysisRequestsView"
+              permission="bika.lims.ManageAnalysisRequests"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Client Analysis Requests View -->
+          <browser:page
+              for="bika.lims.interfaces.IClient"
+              name="base_view"
+              class="bika.lims.browser.client.ClientAnalysisRequestsView"
+              permission="zope2.View"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+
+          <!-- After transitions handler -->
+          <subscriber
+              for="*
+                   Products.DCWorkflow.interfaces.IAfterTransitionEvent"
+              handler="bika.lims.workflow.AfterTransitionEventHandler"
+           />
+
+      </unconfigure>
+
+      <!-- Main Analysis Requests View -->
+      <browser:page
+          for="bika.lims.interfaces.IAnalysisRequestsFolder"
+          name="base_view"
+          class="bhp.lims.browser.analysisrequests.AnalysisRequestsView"
+          permission="bika.lims.ManageAnalysisRequests"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+
+      <!-- Client Analysis Requests View -->
+      <browser:page
+          for="bika.lims.interfaces.IClient"
+          name="base_view"
+          class="bhp.lims.browser.analysisrequests.ClientAnalysisRequestsView"
+          permission="zope2.View"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+
+      <!-- After transitions handler -->
+      <subscriber
+          for="*
+               Products.DCWorkflow.interfaces.IAfterTransitionEvent"
+          handler="bhp.lims.workflow.AfterTransitionEventHandler"
+       />
+  </configure>
+
+</configure>

@@ -9,15 +9,29 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="bhp">
 
+  <!-- We need to first include the configs from other dependencies. This is
+  specially important for overriding: the configs from dependencies must be
+  included first to override them later -->
+  <includeDependencies package="." />
+
   <five:registerPackage package="." initialize=".initialize"/>
 
   <!-- Filesystem directory view -->
   <cmf:registerDirectory name="skins" directory="skins" recursive="True"/>
 
+  <!-- Overrides -->
+  <includeOverrides file="overrides.zcml" />
+
   <!-- Package includes -->
   <include package=".content"/>
   <include package=".browser"/>
   <include package=".setupdata"/>
+
+  <!-- Routes to additional resources (e.g. css, js, etc.) -->
+  <browser:resourceDirectory
+      name="bhp.css"
+      directory="skins/bhp_css"
+      layer="bika.lims.interfaces.IBikaLIMS" />
 
   <!-- Installation Profile -->
   <genericsetup:registerProfile

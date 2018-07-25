@@ -3,12 +3,13 @@
 # Copyright 2018 Botswana Harvard Partnership (BHP)
 
 import logging
+from config import PRODUCT_NAME
 from zope.i18nmessageid import MessageFactory
 
 # Defining a Message Factory for when this product is internationalized.
 bhpMessageFactory = MessageFactory('bhp')
 
-logger = logging.getLogger('bhp')
+logger = logging.getLogger(PRODUCT_NAME)
 
 
 def initialize(context):

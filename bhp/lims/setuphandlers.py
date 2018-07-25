@@ -2,9 +2,16 @@
 #
 # Copyright 2018 Botswana Harvard Partnership (BHP)
 
-from bhp.lims import logger
-from bhp.lims import bhpMessageFactory as _
+from AccessControl.Permissions import access_contents_information
+from AccessControl.Permissions import view
 from BTrees.OOBTree import OOBTree
+from Products.CMFCore.permissions import ModifyPortalContent
+from Products.DCWorkflow.Guard import Guard
+from bhp.lims import bhpMessageFactory as _
+from bhp.lims import logger
+from bika.lims import api
+from bika.lims.permissions import CancelAndReinstate, EditFieldResults, \
+    EditResults, EditSample, PreserveSample, ReceiveSample, ScheduleSampling
 from zope.annotation.interfaces import IAnnotations
 
 
@@ -31,6 +38,11 @@ def setupHandler(context):
     # Sort AR fields (AR Add)
     sort_ar_fields(portal)
 
+    # Setup specimen shipment (from clinic) workflow
+    setup_shipment_workflow(portal)
+
+    # Add additonal metadata and indexes in catalogs
+    add_columns_and_indexes(portal)
 
     logger.info("BHP setup handler [DONE]")
 
@@ -108,6 +120,7 @@ def hide_unused_ar_fields(portal):
     storage.update({"visibility": visibility})
     annotation[AR_CONFIGURATION_STORAGE] = storage
 
+
 def sort_ar_fields(portal):
     """Sort AR fields from AR Add Form
     """
@@ -128,3 +141,57 @@ def sort_ar_fields(portal):
     AR_CONFIGURATION_STORAGE = "bika.lims.browser.analysisrequest.manage.add"
     storage = annotation.get(AR_CONFIGURATION_STORAGE, OOBTree())
     storage.update({"order": sorted})
+
+
+def setup_shipment_workflow(portal):
+    logger.info("*** Setting up shipment workflow ***")
+    setup_shipment_workflow_for(portal, 'bika_sample_workflow')
+    setup_shipment_workflow_for(portal, 'bika_ar_workflow')
+
+
+def setup_shipment_workflow_for(portal, workflow_id):
+    wtool = api.get_tool("portal_workflow")
+    workflow = wtool.getWorkflowById(workflow_id)
+    # Create sample_ordered state
+    sample_ordered = workflow.states.get('sample_ordered')
+    if not sample_ordered:
+        workflow.states.addState('sample_ordered')
+        sample_ordered = workflow.states.sample_ordered
+    sample_ordered.title = "Specimen Ordered"
+    roles = ('Manager', 'LabManager', 'LabClerk', 'Owner')
+    sample_ordered.setPermission(access_contents_information, False, roles)
+    sample_ordered.setPermission(ModifyPortalContent, False, roles)
+    sample_ordered.setPermission(view, False, roles)
+    sample_ordered.setPermission(CancelAndReinstate, False, roles)
+    sample_ordered.setPermission(EditFieldResults, False, ())
+    sample_ordered.setPermission(EditResults, False, ())
+    sample_ordered.setPermission(EditSample, False, roles)
+    sample_ordered.setPermission(PreserveSample, False, ())
+    sample_ordered.setPermission(ReceiveSample, False, ())
+    sample_ordered.setPermission(ScheduleSampling, False, ())
+    sample_ordered.transitions = ('send_to_lab', 'reject')
+
+    # The exit transition of 'no_sampling_workflow' is 'sample_ordered'
+    workflow.transitions.no_sampling_workflow.new_state_id = 'sample_ordered'
+
+    # Create the send transition (ordered --> sample_due)
+    if not workflow.transitions.get('send_to_lab'):
+        workflow.transitions.addTransition('send_to_lab')
+    send_transition = workflow.transitions.send_to_lab
+    send_transition.setProperties(
+        title='Send to Lab',
+        new_state_id='sample_due',
+        after_script_name='',
+        actbox_name="Send to Lab",
+    )
+    guard_send =send_transition.guard or Guard()
+    guard_props = {'guard_permissions': 'BIKA: Add Sample',
+                   'guard_roles': '',
+                   'guard_expr': 'python:here.guard_send_to_lab()'}
+    guard_send.changeFromProperties(guard_props)
+    send_transition.guard = guard_send
+
+
+def add_columns_and_indexes(portal):
+    logger.info("*** Adding columns and indexes ***")
+    pass
