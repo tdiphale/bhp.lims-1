@@ -1,5 +1,6 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:plone="http://namespaces.plone.org/plone"
     i18n_domain="bhp">
 
@@ -12,5 +13,21 @@
       directory="reports"
       type="reports"
       name="BHP Reports"/>
+
+  <browser:page
+      for="bika.lims.interfaces.IAnalysisRequest"
+      name="requisition"
+      class="bhp.lims.browser.requisition.RequisitionFormPdf"
+      permission="zope2.View"
+      layer="bika.lims.interfaces.IBikaLIMS"
+  />
+
+  <browser:page
+      for="bika.lims.interfaces.IAnalysisRequestsFolder"
+      name="requisition"
+      class="bhp.lims.browser.requisition.RequisitionFormPdf"
+      permission="zope2.View"
+      layer="bika.lims.interfaces.IBikaLIMS"
+  />
 
 </configure>

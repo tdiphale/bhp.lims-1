@@ -2,7 +2,6 @@
 #
 # Copyright 2018 Botswana Harvard Partnership (BHP)
 #
-
 from bhp.lims.browser import add_review_state, add_transition
 
 

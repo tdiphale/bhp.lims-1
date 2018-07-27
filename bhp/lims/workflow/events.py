@@ -3,6 +3,7 @@
 # Copyright 2018 Botswana Harvard Partnership (BHP)
 
 from bhp.lims import logger
+from bhp.lims.browser.requisition import generate_requisition_pdf
 from bika.lims.interfaces import IAnalysisRequest, ISample
 from bika.lims.workflow import doActionFor
 from bika.lims.workflow.sample import events as sample_events
@@ -24,6 +25,9 @@ def after_send_to_lab(obj):
         sample = obj.getSample()
         if sample:
             doActionFor(sample, 'send_to_lab')
+
+        # Generate the requisition pdf
+        generate_requisition_pdf(obj)
 
     elif ISample.providedBy(obj):
         sample_events._cascade_transition(obj, 'send_to_lab')

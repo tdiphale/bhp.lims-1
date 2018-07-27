@@ -22,6 +22,38 @@
               permission="zope2.View"
               layer="bika.lims.interfaces.IBikaLIMS"
           />
+          <!-- Workflow action button clicked inside Analysis Request -->
+          <browser:page
+              for="bika.lims.interfaces.IAnalysisRequest"
+              name="workflow_action"
+              class="bika.lims.browser.analysisrequest.AnalysisRequestWorkflowAction"
+              permission="zope.Public"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Workflow action button clicked inside Sample -->
+          <browser:page
+              for="bika.lims.interfaces.ISample"
+              name="workflow_action"
+              class="bika.lims.browser.analysisrequest.AnalysisRequestWorkflowAction"
+              permission="zope.Public"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Workflow action button clicked in Analysis Requests list-->
+          <browser:page
+              for="bika.lims.interfaces.IAnalysisRequestsFolder"
+              name="workflow_action"
+              class="bika.lims.browser.client.ClientWorkflowAction"
+              permission="zope.Public"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Workflow action button clicked in Samples list -->
+          <browser:page
+              for="bika.lims.interfaces.ISamplesFolder"
+              name="workflow_action"
+              class="bika.lims.browser.client.ClientWorkflowAction"
+              permission="zope.Public"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
 
           <!-- After transitions handler -->
           <subscriber
@@ -40,7 +72,6 @@
           permission="bika.lims.ManageAnalysisRequests"
           layer="bika.lims.interfaces.IBikaLIMS"
       />
-
       <!-- Client Analysis Requests View -->
       <browser:page
           for="bika.lims.interfaces.IClient"
@@ -49,7 +80,38 @@
           permission="zope2.View"
           layer="bika.lims.interfaces.IBikaLIMS"
       />
-
+      <!-- Workflow action button clicked inside Analysis Request -->
+      <browser:page
+          for="bika.lims.interfaces.IAnalysisRequest"
+          name="workflow_action"
+          class="bhp.lims.workflow.AnalysisRequestWorkflowAction"
+          permission="zope.Public"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Workflow action button clicked inside Sample -->
+      <browser:page
+          for="bika.lims.interfaces.ISample"
+          name="workflow_action"
+          class="bhp.lims.workflow.SampleWorkflowAction"
+          permission="zope.Public"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Workflow action button clicked in Analysis Requests lists -->
+      <browser:page
+          for="bika.lims.interfaces.IAnalysisRequestsFolder"
+          name="workflow_action"
+          class="bhp.lims.workflow.AnalysisRequestsWorkflowAction"
+          permission="zope.Public"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Workflow action button clicked in Samples list -->
+      <browser:page
+          for="bika.lims.interfaces.ISamplesFolder"
+          name="workflow_action"
+          class="bhp.lims.workflow.SamplesWorkflowAction"
+          permission="zope.Public"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
       <!-- After transitions handler -->
       <subscriber
           for="*

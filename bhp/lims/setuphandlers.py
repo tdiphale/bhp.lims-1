@@ -157,7 +157,7 @@ def setup_shipment_workflow_for(portal, workflow_id):
     if not sample_ordered:
         workflow.states.addState('sample_ordered')
         sample_ordered = workflow.states.sample_ordered
-    sample_ordered.title = "Specimen Ordered"
+    sample_ordered.title = "Sample ordered"
     roles = ('Manager', 'LabManager', 'LabClerk', 'Owner')
     sample_ordered.setPermission(access_contents_information, False, roles)
     sample_ordered.setPermission(ModifyPortalContent, False, roles)
