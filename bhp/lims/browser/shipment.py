@@ -24,6 +24,26 @@ class ShipmentListingDecorator(object):
         add_review_state(listing=listing, review_state=ordered_rev,
                          before_id='sample_due')
 
+        # Add review state button 'sample_shipped'
+        shipped_rev =  {
+            "id": "sample_shipped",
+            "title": ("Shipped"),
+            "contentFilter": {
+                "review_state": ("sample_shipped",),
+                "sort_on": "created",
+                "sort_order": "descending"},
+            "transitions": [],
+            "custom_transitions": [],
+            "columns": listing.columns.keys(),
+        }
+        shipped_rev['columns'] = listing.columns.keys()
+        add_review_state(listing=listing, review_state=shipped_rev,
+                         before_id='sample_due')
+
         # Add transition 'send_to_lab'
         add_transition(listing=listing, transition_id='send_to_lab',
-                       review_state_ids=['default', 'sample_due'])
+                       review_state_ids=['default', 'sample_ordered'])
+
+        # Add transition 'deliver'
+        add_transition(listing=listing, transition_id='deliver',
+                       review_state_ids=['default', 'sample_shipped'])

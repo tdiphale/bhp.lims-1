@@ -30,4 +30,12 @@
       layer="bika.lims.interfaces.IBikaLIMS"
   />
 
+  <browser:page
+      for="bhp.lims.interfaces.ICouriers"
+      name="folder_view"
+      class="bhp.lims.browser.courierfolder.CourierFolderContentsView"
+      permission="bika.lims.ManageBika"
+      layer="bika.lims.interfaces.IBikaLIMS"
+  />
+
 </configure>

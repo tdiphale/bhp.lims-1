@@ -1,10 +1,20 @@
+/** Sample Ordered: grey background by default */
 .bika-listing-table .state-sample_ordered,
 .bika-listing-table .state-sample_ordered a {
     background-color: #efefef !important;
-    color: #888 !important;
 }
+/** Sample Ordered (Client): yellow background */
 body.userrole-client .bika-listing-table .state-sample_ordered,
 body.userrole-client .bika-listing-table .state-sample_ordered a {
+    background-color: #FFFCA7 !important;
+}
+/** Sample Shipped: pink background  by default */
+.bika-listing-table .state-sample_shipped,
+.bika-listing-table .state-sample_shipped a {
     background-color: #F8DAFB !important;
-    color: #000 !important;
+}
+/** Sample Due (client): grey background by default */
+body.userrole-client .bika-listing-table .state-sample_due,
+body.userrole-client .bika-listing-table .state-sample_due a {
+    background-color: #efefef !important;
 }

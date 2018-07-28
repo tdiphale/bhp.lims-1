@@ -16,17 +16,12 @@ def guard_send_to_lab(context):
     a client contact, the Sample (context) is active and it belongs to the same
     client.
     """
-    if IAnalysisRequest.providedBy(context):
-        return guard_send_to_lab(context.getSample())
-
-    if ISamplePartition.providedBy(context):
-        return guard_send_to_lab(context.aq_parent)
-
-    if not ISample.providedBy(context):
+    sample = get_sample(context)
+    if not sample:
         return False
 
     # If Sample is inactive, we cannot send the sample to the lab
-    if not api.is_active(context):
+    if not api.is_active(sample):
         return False
 
     # Only users from role Client can send the sample to the lab
@@ -35,9 +30,43 @@ def guard_send_to_lab(context):
         return False
 
     # Only contacts from the client the Sample belongs to
-    client = context.aq_parent
+    client = sample.aq_parent
     if not client.getContactFromUsername(user.id):
         return False
 
-    # TODO Check if Courier assigned to the Sample
     return True
+
+
+@security.public
+def guard_deliver(context):
+    """Guard for deliver transition. Returns true if a Courier has been 
+    assigned to the Sample and the Sample (context) is active. Note we
+    do not check for roles or client here because permissions for clients
+    when the sample is in state `sample_shipped` are already defined in the
+    workflow definition.
+    """
+    sample = get_sample(context)
+    if not sample:
+        return False
+
+    # If sample is inactive, we cannot deliver the sample to the lab
+    if not api.is_active(sample):
+        return False
+
+    # If sample does not have a courier assigned, we cannot deliver
+    if not sample.Schema()['Courier'].get(sample):
+        return False
+
+    return True
+
+
+def get_sample(instance):
+    """Returns the sample associated to this instance, if any. Otherwise,
+    returns None"""
+    if ISample.providedBy(instance):
+        return instance
+    if IAnalysisRequest.providedBy(instance):
+        return get_sample(instance.getSample())
+    if ISamplePartition.providedBy(instance):
+        return get_sample(instance.aq_parent)
+    return None

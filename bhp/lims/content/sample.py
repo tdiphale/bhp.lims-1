@@ -6,12 +6,16 @@
 from Products.Archetypes.Widget import BooleanWidget
 from Products.Archetypes.public import StringWidget
 from Products.Archetypes.public import TextAreaWidget
+from Products.Archetypes.references import HoldingReference
+from Products.CMFCore.permissions import ModifyPortalContent, View
 from archetypes.schemaextender.interfaces import IOrderableSchemaExtender
 from bhp.lims.config import GENDERS
 from bika.lims import bikaMessageFactory as _
 from bika.lims.browser.widgets import DateTimeWidget
 from bika.lims.browser.widgets import SelectionWidget
-from bika.lims.fields import ExtBooleanField, ExtDateTimeField
+from bika.lims.browser.widgets.referencewidget import ReferenceWidget
+from bika.lims.fields import ExtBooleanField, ExtDateTimeField, \
+    ExtReferenceField
 from bika.lims.fields import ExtStringField
 from bika.lims.fields import ExtTextField
 from bika.lims.interfaces import ISample
@@ -160,6 +164,47 @@ class SampleSchemaExtender(object):
                          'add': 'edit',
                          'header_table': 'visible'},
             ),
+        ),
+
+        ExtReferenceField(
+            'Courier',
+            allowed_types=('Courier'),
+            relationship='SampleCourier',
+            referenceClass=HoldingReference,
+            mode='rw',
+            read_permission=View,
+            write_permission=ModifyPortalContent,
+            widget=ReferenceWidget(
+                label=_("Courier"),
+                description=_("The courier who delivered this sample"),
+                size=20,
+                render_own_label=True,
+                visible={
+                    'view': 'visible',
+                    'edit': 'visible',
+                    'add': 'invisible',
+                    'header_table': 'visible',
+                    'secondary': 'disabled',
+                    'sample_registered': {'view': 'invisible', 'edit': 'invisible'},
+                    'to_be_sampled':     {'view': 'invisible', 'edit': 'invisible'},
+                    'scheduled_sampling':{'view': 'invisible', 'edit': 'invisible'},
+                    'sampled':           {'view': 'invisible', 'edit': 'invisible'},
+                    'to_be_preserved':   {'view': 'invisible', 'edit': 'invisible'},
+                    'sample_ordered':    {'view': 'invisible', 'edit': 'invisible'},
+                    'sample_due':        {'view': 'visible', 'edit': 'visible'},
+                    'sample_prep':       {'view': 'visible', 'edit': 'invisible'},
+                    'sample_received':   {'view': 'visible', 'edit': 'invisible'},
+                    'attachment_due':    {'view': 'visible', 'edit': 'invisible'},
+                    'to_be_verified':    {'view': 'visible', 'edit': 'invisible'},
+                    'verified':          {'view': 'visible', 'edit': 'invisible'},
+                    'published':         {'view': 'visible', 'edit': 'invisible'},
+                    'invalid':           {'view': 'visible', 'edit': 'invisible'},
+                    'rejected':          {'view': 'visible', 'edit': 'invisible'},
+                },
+                catalog_name='portal_catalog',
+                base_query={'review_state': 'active'},
+                showOn=True,
+            )
         ),
     ]
 

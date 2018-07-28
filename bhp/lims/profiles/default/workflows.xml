@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<object name="portal_workflow" meta_type="Plone Workflow Tool">
+    <property name="title" purge="False">Workflow custom definitions</property>
+
+    <!-- Workflows -->
+    <object name="courier_workflow" meta_type="Workflow"/>
+
+    <bindings>
+
+        <!-- Courier -->
+        <type type_id="Courier">
+            <bound-workflow workflow_id="courier_workflow"/>
+        </type>
+        <type type_id="Couriers"/>
+
+    </bindings>
+</object>

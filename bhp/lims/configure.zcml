@@ -33,6 +33,11 @@
       directory="skins/bhp_css"
       layer="bika.lims.interfaces.IBikaLIMS" />
 
+  <browser:resourceDirectory
+      name="bhp.images"
+      directory="skins/bhp_images"
+      layer="bika.lims.interfaces.IBikaLIMS" />
+
   <!-- Installation Profile -->
   <genericsetup:registerProfile
       name="default"
@@ -43,7 +48,7 @@
 
   <!-- Run Setup Script -->
   <genericsetup:importStep
-      name="setup_id_formatting"
+      name="bhp.lims.setupHandler"
       title="BHP LIMS: Run Setup Handler"
       description="Run various configuration actions"
       handler="bhp.lims.setuphandlers.setupHandler">
