@@ -13,5 +13,6 @@
     <adapter factory=".analysisrequest.AnalysisRequestSchemaExtender" />
 
     <adapter factory=".client.ClientSchemaModifier" />
+    <adapter factory=".analysisspec.AnalysisSpecSchemaModifier" />
 
 </configure>

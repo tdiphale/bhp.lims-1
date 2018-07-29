@@ -54,7 +54,14 @@
               permission="zope.Public"
               layer="bika.lims.interfaces.IBikaLIMS"
           />
-
+          <!-- Analysis Specifications Widget -->
+          <browser:page
+              for="*"
+              name="analysis_spec_widget_view"
+              class="bika.lims.browser.widgets.analysisspecificationwidget.AnalysisSpecificationView"
+              permission="zope.Public"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
           <!-- After transitions handler -->
           <subscriber
               for="*
@@ -109,6 +116,14 @@
           for="bika.lims.interfaces.ISamplesFolder"
           name="workflow_action"
           class="bhp.lims.workflow.SamplesWorkflowAction"
+          permission="zope.Public"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Analysis Specifications Widget -->
+      <browser:page
+          for="*"
+          name="analysis_spec_widget_view"
+          class="bhp.lims.browser.analysisspecification.AnalysisSpecificationView"
           permission="zope.Public"
           layer="bika.lims.interfaces.IBikaLIMS"
       />
