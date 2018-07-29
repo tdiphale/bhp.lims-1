@@ -27,13 +27,13 @@ class AnalysisSpecsFolderContentsView(AnalysisSpecsView):
         AnalysisSpecsView.folderitem(self, obj, item, index)
         return folder_item(self, obj, item, index)
 
+
 class ClientAnalysisSpecsFolderContentsView(ClientAnalysisSpecsView):
 
     def __init__(self, context, request):
         super(ClientAnalysisSpecsFolderContentsView, self).__init__(context, request)
         add_column(self, "gender", {"title": _("Gender"), "sortable": False})
         add_column(self, "age", {"title": _("Age"), "sortable": False})
-
 
     def folderitem(self, obj, item, index):
         """Service triggered each time an item is iterated in folderitems.
@@ -45,6 +45,7 @@ class ClientAnalysisSpecsFolderContentsView(ClientAnalysisSpecsView):
         """
         ClientAnalysisSpecsView.folderitem(self, obj, item, index)
         return folder_item(self, obj, item, index)
+
 
 def folder_item(listing, obj, item, index):
     gender = obj.Schema().getField('Gender').get(obj)
