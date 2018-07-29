@@ -84,7 +84,13 @@
                    Products.DCWorkflow.interfaces.IAfterTransitionEvent"
               handler="bika.lims.workflow.AfterTransitionEventHandler"
            />
-
+          <!-- Adapter for specifications import from xls file -->
+          <adapter
+              name="Analysis_Specifications"
+              factory="bika.lims.exportimport.setupdata.Analysis_Specifications"
+              provides="bika.lims.interfaces.ISetupDataImporter"
+              for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+          />
       </unconfigure>
 
       <!-- Main Analysis Requests View -->
@@ -164,7 +170,14 @@
           for="*
                Products.DCWorkflow.interfaces.IAfterTransitionEvent"
           handler="bhp.lims.workflow.AfterTransitionEventHandler"
-       />
+      />
+      <!-- Adapter for specifications import from xls file -->
+      <adapter
+          name="Analysis_Specifications"
+          factory="bhp.lims.setupdata.Analysis_Specifications"
+          provides="bika.lims.interfaces.ISetupDataImporter"
+          for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      />
   </configure>
 
 </configure>
