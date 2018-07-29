@@ -7,6 +7,12 @@ from Products.Archetypes.utils import DisplayList
 PRODUCT_NAME = "bhp.lims"
 
 GENDERS = DisplayList((
-    ('m', ("Male")),
-    ('f', ("Female")),
+    ('m', "Male"),
+    ('f', "Female"),
+))
+
+GENDERS_ANY = DisplayList((
+    ('a', "Any"),
+    ('m', "Male"),
+    ('f', "Female"),
 ))
