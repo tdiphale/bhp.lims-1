@@ -1,0 +1,43 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      i18n:domain="bhp">
+<head>
+    <style>
+        body {
+            font-family: Arial, Verdana, serif;
+            font-size:9pt;
+            width:210mm;
+        }
+    </style>
+</head>
+<body tal:define="
+    plone_view  context/@@plone;
+    portal_url  nocall:context/portal_url;
+    portal      portal_url/getPortalObject;">
+
+  <div class="delivery">
+    <table cellspacing="0" cellpadding="0" width="100%">
+      <tr>
+        <th>Specimen</th>
+        <th>Priority</th>
+        <th>Clinic</th>
+        <th>Participant ID</th>
+        <th>Gender</th>
+        <th>Drawn date</th>
+      </tr>
+      <tal:ar repeat="analysisrequest view/analysis_requests">
+      <tr tal:define="sample python: analysisrequest.getSample();
+                      client python:analysisrequest.aq_parent">
+        <td tal:content="python: analysisrequest.id"></td>
+        <td tal:content="python: analysisrequest.getPriority()"></td>
+        <td tal:content="python: client.Title()"></td>
+        <td tal:content="python: view.get(analysisrequest, 'ParticipantID')"></td>
+        <td tal:content="python: view.get(analysisrequest, 'Gender')"></td>
+        <td tal:content="python: view.get(sample, 'DateSampled')"></td>
+      </tr>
+      </tal:ar>
+    </table>
+  </div>
+</body>
+</html>

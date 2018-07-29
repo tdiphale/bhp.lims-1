@@ -3,6 +3,7 @@
 # Copyright 2018 Botswana Harvard Partnership (BHP)
 
 from bhp.lims import logger
+from bhp.lims.browser.delivery import generate_delivery_pdf
 from bhp.lims.browser.requisition import generate_requisition_pdf
 from bika.lims.interfaces import IAnalysisRequest, ISample
 from bika.lims.workflow import doActionFor
@@ -31,3 +32,22 @@ def after_send_to_lab(obj):
 
     elif ISample.providedBy(obj):
         sample_events._cascade_transition(obj, 'send_to_lab')
+
+
+def after_deliver(obj):
+    """ Event fired after delivery transition is triggered.
+    """
+    logger.info("*** Custom after_deliver transition ***")
+
+    if IAnalysisRequest.providedBy(obj):
+
+        # Promote to sample
+        sample = obj.getSample()
+        if sample:
+            doActionFor(sample, 'deliver')
+
+    elif ISample.providedBy(obj):
+        sample_events._cascade_transition(obj, 'deliver')
+
+        # Generate the delivery pdf
+        generate_delivery_pdf(obj)
