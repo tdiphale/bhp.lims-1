@@ -46,6 +46,10 @@ def setupHandler(context):
     # Setup specimen shipment (from clinic) workflow
     setup_shipment_workflow(portal)
 
+    # TODO move to upgradesteps
+    # Update priorities to Urgent, Routine, STAT
+    update_priorities(portal)
+
     logger.info("BHP setup handler [DONE]")
 
 
@@ -306,3 +310,22 @@ def get_workflows():
         if hasattr(aq_base(wf), "updateRoleMappingsFor"):
             wfs[wfid] = wf
     return wfs
+
+
+def update_priorities(portal):
+    """Reset the priorities of created ARs to those defined for BHP
+    1: Urgent, 3: Routine, 5: STAT
+    """
+    logger.info("*** Restoring Priorities ***")
+    query = dict(portal_type='AnalysisRequest')
+    brains = api.search(query, CATALOG_ANALYSIS_REQUEST_LISTING)
+    for brain in brains:
+        obj = api.get_object(brain)
+        if obj.getPriority() == '2':
+            # High --> Urgent (1)
+            obj.setPriority(1)
+            obj.reindexObject()
+        elif obj.getPriority() == '4':
+            # Low --> STAT
+            obj.setPriority(5)
+            obj.reindexObject()

@@ -4,6 +4,7 @@ Changelog
 1.0.0 (unreleased)
 ------------------
 
+- #22 Reduce 'Priority' to 3 options: Urgent, Routine, STAT
 - #17 Make "Fasting" field optional in AR Add form
 - #16 Make "Other Participant Ref" optional in AR Add form
 - #13 Increase the Participant ID field to 22 characters

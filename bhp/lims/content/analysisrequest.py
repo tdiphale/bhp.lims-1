@@ -9,7 +9,7 @@ from Products.Archetypes.public import TextAreaWidget
 from Products.CMFCore.permissions import ModifyPortalContent, View
 from archetypes.schemaextender.interfaces import IOrderableSchemaExtender
 from archetypes.schemaextender.interfaces import ISchemaModifier
-from bhp.lims.config import GENDERS
+from bhp.lims.config import GENDERS, PRIORITIES
 from bika.lims import bikaMessageFactory as _
 from bika.lims.browser.fields.proxyfield import ExtProxyField
 from bika.lims.browser.widgets import DateTimeWidget
@@ -240,4 +240,5 @@ class AnalysisRequestSchemaModifier(object):
 
     def fiddle(self, schema):
         schema['ClientSampleID'].widget.label = _("Client Sample ID (if available)")
+        schema['Priority'].vocabulary = PRIORITIES
         return schema
