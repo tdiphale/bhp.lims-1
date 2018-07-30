@@ -61,6 +61,9 @@ def setup_laboratory(portal):
     lab.edit(title=_('BHP'))
     lab.reindexObject()
 
+    # Set autoprinting of stickers on register
+    portal.bika_setup.setAutoPrintStickers('register')
+
 
 def setup_new_content_types(portal):
     """Setup new content types"""
@@ -109,6 +112,7 @@ def setup_id_formatting(portal):
 
     # Analysis Request ID format
     set_format(dict(form='{sampleId}R{seq:d}',
+                    context='sample',
                     portal_type='AnalysisRequest',
                     counter_reference='AnalysisRequestSample',
                     counter_type='backreference',
