@@ -8,6 +8,7 @@
             font-family: Arial, Verdana, serif;
             font-size:9pt;
             width:210mm;
+            margin:auto;
         }
         h1 { font-size:11pt; text-transform:uppercase; }
         h2 { font-size:11pt; }
