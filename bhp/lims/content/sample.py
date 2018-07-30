@@ -9,6 +9,7 @@ from Products.Archetypes.public import TextAreaWidget
 from Products.Archetypes.references import HoldingReference
 from Products.CMFCore.permissions import ModifyPortalContent, View
 from archetypes.schemaextender.interfaces import IOrderableSchemaExtender
+from archetypes.schemaextender.interfaces import ISchemaModifier
 from bhp.lims.config import GENDERS
 from bika.lims import bikaMessageFactory as _
 from bika.lims.browser.widgets import DateTimeWidget
@@ -214,3 +215,15 @@ class SampleSchemaExtender(object):
 
     def getFields(self):
         return self.fields
+
+
+class SampleSchemaModifier(object):
+    adapts(ISample)
+    implements(ISchemaModifier)
+
+    def __init__(self, context):
+        self.context = context
+
+    def fiddle(self, schema):
+        schema['ClientSampleID'].widget.label = _("Client Sample ID (if available)")
+        return schema

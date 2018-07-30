@@ -4,11 +4,19 @@
 
     <include package="archetypes.schemaextender" />
 
-    <adapter factory=".sample.SampleSchemaExtender" />
+    <!-- Analysis Request -->
     <adapter factory=".analysisrequest.AnalysisRequestSchemaExtender" />
-    <adapter factory=".analysisspec.AnalysisSpecsSchemaExtender" />
+    <adapter factory=".analysisrequest.AnalysisRequestSchemaModifier" />
 
+    <!-- Sample -->
+    <adapter factory=".sample.SampleSchemaExtender" />
+    <adapter factory=".sample.SampleSchemaModifier" />
+
+    <!-- Client -->
     <adapter factory=".client.ClientSchemaModifier" />
+
+    <!-- Analysis Specifications -->
+    <adapter factory=".analysisspec.AnalysisSpecsSchemaExtender" />
     <adapter factory=".analysisspec.AnalysisSpecSchemaModifier" />
 
 </configure>

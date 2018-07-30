@@ -8,6 +8,7 @@ from Products.Archetypes.public import StringWidget
 from Products.Archetypes.public import TextAreaWidget
 from Products.CMFCore.permissions import ModifyPortalContent, View
 from archetypes.schemaextender.interfaces import IOrderableSchemaExtender
+from archetypes.schemaextender.interfaces import ISchemaModifier
 from bhp.lims.config import GENDERS
 from bika.lims import bikaMessageFactory as _
 from bika.lims.browser.fields.proxyfield import ExtProxyField
@@ -153,7 +154,7 @@ class AnalysisRequestSchemaExtender(object):
             mode="rw",
             required=1,
             widget=StringWidget(
-                label=_("Volume"),
+                label=_("Estimated Sample Volume"),
                 maxlength=8,
                 size=8,
                 render_own_label=True,
@@ -228,3 +229,15 @@ class AnalysisRequestSchemaExtender(object):
 
     def getFields(self):
         return self.fields
+
+
+class AnalysisRequestSchemaModifier(object):
+    adapts(IAnalysisRequest)
+    implements(ISchemaModifier)
+
+    def __init__(self, context):
+        self.context = context
+
+    def fiddle(self, schema):
+        schema['ClientSampleID'].widget.label = _("Client Sample ID (if available)")
+        return schema
