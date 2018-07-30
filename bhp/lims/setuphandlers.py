@@ -122,14 +122,12 @@ def hide_unused_ar_fields(portal):
     logger.info("*** Hiding default fields from AR Add ***")
     field_names_to_hide = ["AdHoc", "Batch", "CCContact", "CCEmails",
                            "ClientOrderNumber", "ClientReference",
-                           "ClientSampleID", "Composite", "Contact",
-                           "DateSampled", "DefaultContainerType",
+                           "Composite", "Contact", "DefaultContainerType",
                            "EnvironmentalConditions", "InvoiceExclude",
-                           "PreparationWorkflow", "Priority", "Sample",
+                           "PreparationWorkflow", "Sample", "Profiles",
                            "SampleCondition", "SamplePoint", "Sampler",
                            "SamplingDate", "SamplingDeviation", "SamplingRound",
-                           "Specification", "StorageLocation", "SubGroup",
-                           "Template",]
+                           "Specification", "StorageLocation", "SubGroup",]
 
     bika_setup = portal.bika_setup
     annotation = IAnnotations(bika_setup)
@@ -137,8 +135,8 @@ def hide_unused_ar_fields(portal):
     storage = annotation.get(AR_CONFIGURATION_STORAGE, OOBTree())
 
     visibility = storage.get('visibility', {}).copy()
-    for field_name in field_names_to_hide:
-        visibility[field_name] = False
+    for field_name in visibility.keys():
+        visibility[field_name] = field_name not in field_names_to_hide
     storage.update({"visibility": visibility})
     annotation[AR_CONFIGURATION_STORAGE] = storage
 
@@ -149,11 +147,11 @@ def sort_ar_fields(portal):
     logger.info("*** Sorting fields from AR Add ***")
     sorted=['Client', 'Contact', 'ParticipantID', 'OtherParticipantReference',
             'ParticipantInitials', 'Gender', 'Visit', 'DateOfBirth', 'Fasting',
-            'DateSampled', 'SampleType', 'Volume', 'Profiles', 'OtherInformation',
-            '_ARAttachment', 'CCContact', 'CCEmails', 'Sample', 'Batch',
-            'SamplingRound', 'SubGroup', 'Template', 'Sampler', 'SamplingDate',
-            'Specification', 'SamplePoint', 'StorageLocation',
-            'ClientOrderNumber', 'ClientReference', 'ClientSampleID',
+            'ClientSampleID', 'DateSampled', 'SampleType', 'Volume', 'Profiles',
+            'Template', 'OtherInformation', '_ARAttachment', 'CCContact',
+            'CCEmails', 'Sample', 'Batch', 'SamplingRound', 'SubGroup',
+            'Sampler', 'SamplingDate', 'Specification', 'SamplePoint',
+            'StorageLocation', 'ClientOrderNumber', 'ClientReference',
             'SamplingDeviation', 'SampleCondition', 'Priority',
             'EnvironmentalConditions', 'DefaultContainerType', 'AdHoc',
             'Composite', 'InvoiceExclude', 'PreparationWorkflow']
