@@ -108,7 +108,7 @@ class SampleSchemaExtender(object):
 
         ExtBooleanField(
             "Fasting",
-            required=1,
+            required=0,
             default=False,
             widget=BooleanWidget(
                 format="radio",

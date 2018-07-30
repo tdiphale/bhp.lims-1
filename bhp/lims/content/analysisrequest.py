@@ -117,7 +117,7 @@ class AnalysisRequestSchemaExtender(object):
             "Fasting",
             proxy="context.getSample()",
             mode="rw",
-            required=1,
+            required=0,
             default=False,
             widget=BooleanWidget(
                 format="radio",
