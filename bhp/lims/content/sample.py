@@ -36,8 +36,8 @@ class SampleSchemaExtender(object):
             required=1,
             widget=StringWidget(
                 label=_("Participant ID"),
-                maxlength=8,
-                size=8,
+                maxlength=22,
+                size=22,
                 render_own_label=True,
                 visible={'edit': 'visible',
                          'view': 'visible',
