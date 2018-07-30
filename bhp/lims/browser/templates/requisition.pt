@@ -8,7 +8,6 @@
             font-family: Arial, Verdana, serif;
             font-size:9pt;
             width:210mm;
-            margin:auto;
         }
         h1 { font-size:11pt; text-transform:uppercase; }
         h2 { font-size:11pt; }
@@ -76,6 +75,12 @@
           padding:0px 10px;
           float:left;
         }
+        #dateOfBirth{
+          margin-top:30px;
+        }
+        .page-body{
+          margin-left: -6px;
+        }
     </style>
 </head>
 <body tal:define="
@@ -134,14 +139,18 @@
               <div class="value" tal:content="python: view.get(sample, 'Gender')"></div>
             </div>
             <div class="field">
-              <div class="label">Gen (M/F)</div>
+              <div class="label">Visit</div>
               <div class="value" tal:content="python: view.get(sample, 'Visit')"></div>
             </div>
             <div class="field">
               <div class="label">Fasting</div>
               <div class="value" tal:content="python: view.get(sample, 'Fasting') and 'Y' or 'N'"></div>
             </div>
-            <div class="clearfix"></div>
+            <div class="field" id="dateOfBirth">
+              <div class="label">Date of Birth</div>
+              <div class="value" tal:content="python: view.get(sample, 'DateOfBirth')"></div>
+            </div>
+             <div class="clearfix"></div>
           </div>
         </div>
         <div class="section">
