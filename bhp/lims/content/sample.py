@@ -48,7 +48,7 @@ class SampleSchemaExtender(object):
 
         ExtStringField(
             "OtherParticipantReference",
-            required=1,
+            required=0,
             widget=StringWidget(
                 label=_("Other Participant Ref"),
                 maxlength=12,

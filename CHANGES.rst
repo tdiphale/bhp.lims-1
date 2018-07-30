@@ -4,6 +4,7 @@ Changelog
 1.0.0 (unreleased)
 ------------------
 
+- #16 Make "Other Participant Ref" optional in AR Add form
 - #13 Increase the Participant ID field to 22 characters
 - #18 Added `sample_shipped` status and `deliver` transition
 - #18 Added Courier and Couriers list
