@@ -6,14 +6,17 @@ from Acquisition import aq_base
 from BTrees.OOBTree import OOBTree
 from Products.CMFCore.permissions import ModifyPortalContent, View, \
     AccessContentsInformation
+from Products.CMFPlone.utils import _createObjectByType
 from Products.DCWorkflow.Guard import Guard
 from bhp.lims import bhpMessageFactory as _
 from bhp.lims import logger
 from bika.lims import api
 from bika.lims.catalog.analysisrequest_catalog import \
     CATALOG_ANALYSIS_REQUEST_LISTING
+from bika.lims.idserver import renameAfterCreation
 from bika.lims.permissions import CancelAndReinstate, EditFieldResults, \
     EditResults, EditSample, PreserveSample, ReceiveSample, ScheduleSampling
+from bika.lims.utils import tmpID
 from zope.annotation.interfaces import IAnnotations
 
 
@@ -45,6 +48,9 @@ def setupHandler(context):
 
     # Setup specimen shipment (from clinic) workflow
     setup_shipment_workflow(portal)
+
+    # Setup Attachment Types (requisition + delivery)
+    setup_attachment_types(portal)
 
     # TODO move to upgradesteps
     # Update priorities to Urgent, Routine, STAT
@@ -331,3 +337,45 @@ def update_priorities(portal):
             # Low --> STAT
             obj.setPriority(5)
             obj.reindexObject()
+
+def setup_attachment_types(portal):
+    """Creates two attachment types. One for requisition and another one for
+    the checklist delivery report
+    """
+    logger.info("*** Creating custom Attachment Types ***")
+    new_attachment_types = ['Requisition', 'Delivery']
+    folder = portal.bika_setup.bika_attachmenttypes
+    for attachment in folder.values():
+        if attachment.Title() in new_attachment_types:
+            new_attachment_types.remove(attachment.Title())
+
+    atts_uids = {}
+    for new_attachment in new_attachment_types:
+        obj = _createObjectByType("AttachmentType", folder, tmpID())
+        obj.edit(title=new_attachment,
+                 description="Attachment type for {} files".format(new_attachment))
+        obj.unmarkCreationFlag()
+        renameAfterCreation(obj)
+
+
+    logger.info("*** Assign Attachment Types to requisition and rejection ***")
+    new_attachment_types = {'Requisition': None, 'Delivery': None}
+    for attachment in folder.values():
+        for att_type in new_attachment_types.keys():
+            if attachment.Title() == att_type:
+                new_attachment_types[att_type] = attachment
+                break
+
+    query = dict(portal_type='AnalysisRequest')
+    brains = api.search(query, CATALOG_ANALYSIS_REQUEST_LISTING)
+    for brain in brains:
+        obj = api.get_object(brain)
+        attachments = obj.getAttachment()
+        for attachment in attachments:
+            if attachment.getAttachmentType():
+                continue
+            for key, val in new_attachment_types.items():
+                if key.lower() in attachment.getAttachmentFile().filename:
+                    attachment.setAttachmentType(val)
+                    attachment.setReportOption('i') # Ignore in report
+                    break

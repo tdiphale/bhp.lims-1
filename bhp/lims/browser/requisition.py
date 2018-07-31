@@ -85,6 +85,15 @@ def generate_requisition_pdf(ar_or_sample):
     att = _createObjectByType(
         "Attachment", ar_or_sample.aq_parent, attid)
     att.setAttachmentFile(open(pdf_fn))
+    att.setReportOption('i') # Ignore in report
+
+    # Try to assign the Requisition Attachment Type
+    query = dict(portal_type='AttachmentType', title='Requisition')
+    brains = api.search(query, 'bika_setup_catalog')
+    if brains:
+        att_type = api.get_object(brains[0])
+        att.setAttachmentType(att_type)
+
     # Awkward workaround to rename the file
     attf = att.getAttachmentFile()
     attf.filename = '%s.pdf' % filename
