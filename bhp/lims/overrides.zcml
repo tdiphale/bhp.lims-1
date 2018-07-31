@@ -78,6 +78,14 @@
               permission="zope.Public"
               layer="bika.lims.interfaces.IBikaLIMS"
           />
+          <!-- Stickers preview and rendering -->
+          <browser:page
+              for="*"
+              name="sticker"
+              class="bika.lims.browser.stickers.Sticker"
+              permission="zope2.View"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
           <!-- After transitions handler -->
           <subscriber
               for="*
@@ -163,6 +171,14 @@
           name="analysis_spec_widget_view"
           class="bhp.lims.browser.analysisspecification.AnalysisSpecificationView"
           permission="zope.Public"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Custom sticker rendering for zebra -->
+      <browser:page
+          for="*"
+          name="sticker"
+          class="bhp.lims.browser.stickers.Sticker"
+          permission="zope2.View"
           layer="bika.lims.interfaces.IBikaLIMS"
       />
       <!-- After transitions handler -->

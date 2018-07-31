@@ -1,0 +1,23 @@
+<tal:sticker define="
+     item              view/current_item;
+     sample            python:item[1];
+     show_partitions   python:context.bika_setup.getShowPartitions();
+     smart_id          python:sample.getId() if show_partitions else sample.getId();
+     initials          python:sample.Schema().getField('ParticipantInitials').get(sample);
+     pid               python:sample.Schema().getField('ParticipantID').get(sample);
+     gender            python:sample.Schema().getField('Gender').get(sample).upper();
+     dob               python:sample.Schema().getField('DateOfBirth').get(sample).strftime('%d/%m/%Y');">
+
+    <div class="barcode"
+        tal:attributes="data-id smart_id;"
+        data-code="code93"
+        data-barHeight="12"
+        data-barWidth="1"
+        data-addQuietZone="true"
+        data-showHRI="true">
+    </div>
+    <div tal:content='smart_id'></div>
+    <div><span tal:content='pid'></span> <span tal:content='initials'></span></div>
+    <div>dob: <span tal:content='dob'></span> <span tal:content='gender'></span></div>
+
+</tal:sticker>
