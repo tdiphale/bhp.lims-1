@@ -50,7 +50,7 @@ class SampleARWorkflowAction(BaseAnalysisRequestWorkflowAction):
             # TODO Page does not get refreshed when displaying pdf
             #self.destination_url = '{}/workflow_action?workflow_action=download_requisition'\
             #    .format(self.context.absolute_url())
-            self.destination_url = self.context_absolute_url()
+            self.destination_url = self.context.absolute_url()
             self.request.response.redirect(self.destination_url)
         else:
             return
