@@ -4,7 +4,7 @@ Sticker margins: 1mm
 */
 .sticker {
     margin:0 auto;
-    padding:2mm 1mm;
+    padding:2mm 2mm;
     width: 30.0mm;
     height: 23.0mm;
     font-family: Helvetica, Arial;
@@ -24,7 +24,7 @@ Sticker margins: 1mm
 
 @media print {
     @page {
-        size:  30.0mm 12.7mm !important;
+        size:  30.0mm 23mm !important;
         margin: 0mm !important;
     }
     html, body {
