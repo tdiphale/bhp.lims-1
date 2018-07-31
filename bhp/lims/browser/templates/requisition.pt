@@ -20,6 +20,7 @@
         .header-part {
           float:left;
           border:1px solid #fff;
+          margin-left: -40px;
         }
         .header-part.barcode-container {
           width:25%;
@@ -33,10 +34,12 @@
         }
         .requisition {
             width:210mm;
+            padding: 20px;
         }
         .lab-title {
           font-weight:bold;
           font-size:12pt;
+          margin-right: 35px;
         }
         .lab-title .lab-address {
           font-weight:normal;
@@ -51,7 +54,8 @@
           margin:5px;
           float:left;
           border:1px solid #333;
-          width:40%;
+          border-radius:10px;
+          width:36%;
         }
         .clearfix {
           clear:both;
@@ -79,7 +83,7 @@
           margin-top:30px;
         }
         .page-body{
-          margin-left: -6px;
+          margin-left:-65px;
         }
     </style>
 </head>
@@ -94,13 +98,8 @@
                      client python:analysisrequest.aq_parent">
       <div class="page-header">
         <div class='header-part barcode-container'>
-          <div class='barcode'
-               data-code='code128'
-               data-showHRI='false'
-               data-barHeight='15'
-               data-addQuietZone='true'
-               tal:attributes="data-id python:analysisrequest.id">
-          </div>
+          <img tal:attributes="src python:view.get_barcode(analysisrequest);"
+               style="width:150px">
         </div>
         <div class="header-part lab-title">
           BOTSWANA HARVARD HIV REFERENCE LABORATORY
