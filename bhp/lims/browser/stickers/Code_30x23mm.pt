@@ -1,0 +1,32 @@
+<tal:sticker define="
+     item              view/current_item;
+     sample            python:item[1];
+     client            python:sample.aq_parent;
+     study_code        python:client.getTaxNumber();
+     site_id           python:client.id;
+     show_partitions   python:context.bika_setup.getShowPartitions();
+     smart_id          python:sample.getId() if show_partitions else sample.getId();
+     initials          python:sample.Schema().getField('ParticipantInitials').get(sample);
+     sampletype        python:sample.getSampleType().getPrefix();
+     pid               python:sample.Schema().getField('ParticipantID').get(sample);
+     gender            python:sample.Schema().getField('Gender').get(sample).upper();
+     dob               python:sample.Schema().getField('DateOfBirth').get(sample).strftime('%d/%m/%Y');
+     date_sampled      python:sample.Schema().getField('DateSampled').get(sample).strftime('%d/%m/%Y %H:%M');">
+
+    <div>
+        <span tal:content="site_id"></span> <span tal:content="study_code"></span> <span tal:content="sampletype"></span>
+    </div>
+    <div class="barcode"
+        tal:attributes="data-id smart_id;"
+        data-code="code93"
+        data-barHeight="12"
+        data-barWidth="1"
+        data-addQuietZone="true"
+        data-showHRI="false">
+    </div>
+    <div tal:content='smart_id'></div>
+    <div><span tal:content='pid'></span> <span tal:content='initials'></span></div>
+    <div>dob: <span tal:content='dob'></span> <span tal:content='gender'></span></div>
+    <div tal:content="date_sampled"></div>
+
+</tal:sticker>

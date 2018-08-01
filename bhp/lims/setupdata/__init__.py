@@ -42,7 +42,7 @@ class Analysis_Specifications(WorksheetImporter):
             analysis = api.get_object(analysis[0])
 
             # TODO No Sample Type defined in the file, just use Whole Blood
-            st_title = row.get('sampletype', 'Whole Blood')
+            st_title = row.get('sample_type', 'Whole Blood')
             query = dict(portal_type="SampleType", title=st_title)
             sample_type = api.search(query, 'bika_setup_catalog')
             if not sample_type:
@@ -59,7 +59,14 @@ class Analysis_Specifications(WorksheetImporter):
             gender = row.get('gender', 'a')
             gender = gender == 'mf' and 'a' or gender
             age_low = row.get('age_low', '')
+            if age_low:
+                age_low = '{}{}'.format(age_low, row.get('age_low_unit', 'd'))
             age_high = row.get('age_high', '')
+            if age_high:
+                age_high = '{}{}'.format(age_high, row.get('age_high_unit', 'd'))
+            if not age_low and not age_high:
+                logger.warn("Cannot create Spec, Age low and high not defined.")
+                continue
             max_panic = row.get('panic_high_value', '')
             min_panic = row.get('panic_low_value', '')
 
@@ -73,9 +80,9 @@ class Analysis_Specifications(WorksheetImporter):
                     str_gender = 'MF'
                 specs_key.append(str_gender)
             if age_low and age_high:
-                specs_key.append('{}-{}'.format(age_low, age_high))
+                specs_key.append('{} - {}'.format(age_low, age_high))
             elif age_low:
-                specs_key.append('({}-)'.format(age_low))
+                specs_key.append('({}+)'.format(age_low))
             elif age_high:
                 specs_key.append('(-{})'.format(age_high))
             specs_title = ' '.join(specs_key)

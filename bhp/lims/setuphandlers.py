@@ -6,14 +6,17 @@ from Acquisition import aq_base
 from BTrees.OOBTree import OOBTree
 from Products.CMFCore.permissions import ModifyPortalContent, View, \
     AccessContentsInformation
+from Products.CMFPlone.utils import _createObjectByType
 from Products.DCWorkflow.Guard import Guard
 from bhp.lims import bhpMessageFactory as _
 from bhp.lims import logger
 from bika.lims import api
 from bika.lims.catalog.analysisrequest_catalog import \
     CATALOG_ANALYSIS_REQUEST_LISTING
+from bika.lims.idserver import renameAfterCreation
 from bika.lims.permissions import CancelAndReinstate, EditFieldResults, \
     EditResults, EditSample, PreserveSample, ReceiveSample, ScheduleSampling
+from bika.lims.utils import tmpID
 from zope.annotation.interfaces import IAnnotations
 
 
@@ -46,9 +49,15 @@ def setupHandler(context):
     # Setup specimen shipment (from clinic) workflow
     setup_shipment_workflow(portal)
 
+    # Setup Attachment Types (requisition + delivery)
+    setup_attachment_types(portal)
+
     # TODO move to upgradesteps
     # Update priorities to Urgent, Routine, STAT
     update_priorities(portal)
+
+    # update analysis services (Replace % by PCT in Analysis Keywords)
+    update_services(portal)
 
     logger.info("BHP setup handler [DONE]")
 
@@ -200,6 +209,9 @@ def setup_shipment_workflow(portal):
     update_objects(query, CATALOG_ANALYSIS_REQUEST_LISTING)
     update_objects(query, 'bika_catalog')
 
+    # Update couriers (we want Clients to have access to them)
+    update_objects(dict(portal_type='Courier'), 'portal_catalog')
+
 
 def setup_shipment_workflow_for(portal, workflow_id):
     wtool = api.get_tool("portal_workflow")
@@ -210,7 +222,7 @@ def setup_shipment_workflow_for(portal, workflow_id):
     if not sample_ordered:
         workflow.states.addState('sample_ordered')
         sample_ordered = workflow.states.sample_ordered
-    sample_ordered.title = "Sample ordered"
+    sample_ordered.title = "Ordered"
     # TODO Review role permissions when sample is ordered
     roles = ('Manager', 'LabManager', 'LabClerk', 'Owner')
     sample_ordered.setPermission(AccessContentsInformation, False, roles)
@@ -233,7 +245,7 @@ def setup_shipment_workflow_for(portal, workflow_id):
     if not sample_shipped:
         workflow.states.addState('sample_shipped')
         sample_shipped = workflow.states.sample_shipped
-    sample_shipped.title = "Sample shipped"
+    sample_shipped.title = "Shipped"
     roles = ('Manager', 'LabManager', 'LabClerk', 'Owner')
     # TODO Review role permissions when sample is shipped
     sample_shipped.setPermission(AccessContentsInformation, False, roles)
@@ -270,10 +282,10 @@ def setup_shipment_workflow_for(portal, workflow_id):
         workflow.transitions.addTransition('deliver')
     deliver_transition = workflow.transitions.deliver
     deliver_transition.setProperties(
-        title='Deliver',
+        title="Receive at reception",
         new_state_id='sample_due',
         after_script_name='',
-        actbox_name="Deliver sample",
+        actbox_name="Receive at reception",
     )
     guard_deliver = deliver_transition.guard or Guard()
     guard_props = {'guard_permissions': 'BIKA: Add Sample',
@@ -283,7 +295,12 @@ def setup_shipment_workflow_for(portal, workflow_id):
     deliver_transition.guard = guard_deliver
 
     # Change the title "Sample Due" to "Sample Delivered"
-    workflow.states.sample_due.title = "Sample delivered"
+    workflow.states.sample_due.title = "At reception"
+    # Change the title "Sample received" to "At point of testing"
+    workflow.transitions.receive.title="Receive at point of testing"
+    workflow.transitions.receive.actbox_name = "Receive at point of testing"
+    workflow.states.sample_received.title = "At point of testing"
+
 
 
 def update_role_mappings(obj_or_brain, wfs=None, reindex=True):
@@ -331,3 +348,57 @@ def update_priorities(portal):
             # Low --> STAT
             obj.setPriority(5)
             obj.reindexObject()
+
+
+def update_services(portal):
+    logger.info("*** Updating services ***")
+    for service in portal.bika_setup.bika_analysisservices.values():
+        keyword = service.Schema().getField('Keyword').get(service)
+        if '%' in keyword:
+            keyword = keyword.replace('%', '_PCT')
+            logger.info("Replaced Analysis Keyword: {}".format(keyword))
+            service.setKeyword(keyword)
+            service.reindexObject()
+
+
+def setup_attachment_types(portal):
+    """Creates two attachment types. One for requisition and another one for
+    the checklist delivery report
+    """
+    logger.info("*** Creating custom Attachment Types ***")
+    new_attachment_types = ['Requisition', 'Delivery']
+    folder = portal.bika_setup.bika_attachmenttypes
+    for attachment in folder.values():
+        if attachment.Title() in new_attachment_types:
+            new_attachment_types.remove(attachment.Title())
+
+    atts_uids = {}
+    for new_attachment in new_attachment_types:
+        obj = _createObjectByType("AttachmentType", folder, tmpID())
+        obj.edit(title=new_attachment,
+                 description="Attachment type for {} files".format(new_attachment))
+        obj.unmarkCreationFlag()
+        renameAfterCreation(obj)
+
+
+    logger.info("*** Assign Attachment Types to requisition and rejection ***")
+    new_attachment_types = {'Requisition': None, 'Delivery': None}
+    for attachment in folder.values():
+        for att_type in new_attachment_types.keys():
+            if attachment.Title() == att_type:
+                new_attachment_types[att_type] = attachment
+                break
+
+    query = dict(portal_type='AnalysisRequest')
+    brains = api.search(query, CATALOG_ANALYSIS_REQUEST_LISTING)
+    for brain in brains:
+        obj = api.get_object(brain)
+        attachments = obj.getAttachment()
+        for attachment in attachments:
+            if attachment.getAttachmentType():
+                continue
+            for key, val in new_attachment_types.items():
+                if key.lower() in attachment.getAttachmentFile().filename:
+                    attachment.setAttachmentType(val)
+                    attachment.setReportOption('i') # Ignore in report
+                    break

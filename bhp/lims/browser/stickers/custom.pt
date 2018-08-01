@@ -1,0 +1,42 @@
+<tal:sticker define="
+     item              view/current_item;
+     sample            python: item[1];
+     show_partitions   python: context.bika_setup.getShowPartitions();
+     smart_id          python: sample.getId() if show_partitions else sample.getId();
+     client            python: sample.aq_parent;
+
+     protocol             python: '085';
+     site                 python: '40';
+     clinician_initials   python: 'SK';
+     alpha_code           python: 'PL';
+     primary              python: '08';
+     barcode_value        python: smart_id;
+     aliquot_identifier   python: smart_id;
+     subject_identifier   python: 'Infant PBMC PL';
+     initials             python: 'LD';
+     dob                  python: '2018-07-20';
+     gender               python: 'M';
+     drawn_datetime       python: '2018-07-23 09:40:00';
+     panel                python: '';
+">
+<div>ZPL CUSTOM</div>
+<div style="display:none">
+
+
+[ZPL-FORMAT]
+
+^XA^PR4
+^FO315,15^A0N,20,15^FD<a tal:replace="protocol"></a> Site <a tal:replace="site"></a> <a tal:replace="clinician_initials"></a> <a tal:replace="alpha_code"></a> <a tal:replace="primary"></a>^FS
+^FO315,34^BY1^BCN,50,N,N,N,A
+^FD<a tal:replace="barcode_value"></a>^FS
+^FO315,92^A0N,20,15^FD<a tal:replace="aliquot_identifier"></a>^FS
+^FO315,112^A0N,20,15^FD<a tal:replace="subject_identifier"></a> (<a tal:replace="initials"></a>)^FS
+^FO315,132^A0N,20,15^FDDOB: <a tal:replace="dob"></a> <a tal:replace="gender"></a>^FS
+^FO315,152^A0N,20,15^FD<a tal:replace="drawn_datetime"></a>  <a tal:replace="panel"></a>^FS
+^XZ
+
+[/ZPL-FORMAT]
+
+
+</div>
+</tal:sticker>

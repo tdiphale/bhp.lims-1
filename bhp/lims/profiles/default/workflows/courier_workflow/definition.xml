@@ -49,6 +49,7 @@
       <permission-role>LabManager</permission-role>
       <permission-role>LabClerk</permission-role>
       <permission-role>Owner</permission-role>
+      <permission-role>Client</permission-role>
     </permission-map>
 
     <!-- Add portal content -->
@@ -57,6 +58,7 @@
       <permission-role>LabManager</permission-role>
       <permission-role>LabClerk</permission-role>
       <permission-role>Owner</permission-role>
+      <permission-role>Client</permission-role>
     </permission-map>
 
     <!-- View -->
@@ -65,6 +67,7 @@
       <permission-role>LabManager</permission-role>
       <permission-role>LabClerk</permission-role>
       <permission-role>Owner</permission-role>
+      <permission-role>Client</permission-role>
     </permission-map>
 
     <!-- Access contents information -->
@@ -84,6 +87,7 @@
       <permission-role>LabManager</permission-role>
       <permission-role>LabClerk</permission-role>
       <permission-role>Owner</permission-role>
+      <permission-role>Client</permission-role>
     </permission-map>
 
   </state>

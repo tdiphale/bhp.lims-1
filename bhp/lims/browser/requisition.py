@@ -4,12 +4,16 @@
 #
 import os
 import tempfile
+from StringIO import StringIO
 from base64 import b64encode
+
 from Products.CMFPlone.utils import _createObjectByType
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+import barcode
+from barcode.codex import Code128
 from barcode.writer import ImageWriter
-from barcode import Code39
+from barcode import generate, EAN13, Code39
 from bhp.lims import logger
 from bika.lims import api
 from bika.lims.browser import BrowserView
@@ -68,11 +72,7 @@ class RequisitionFormPdf(BrowserView):
         contact = api.get_user_contact(user)
         return contact.getDepartment()
 
-
-
-
-
-
+      
 def generate_requisition_pdf(ar_or_sample):
     if not ar_or_sample:
         logger.warn("No Analysis Request or Sample provided")
@@ -100,6 +100,15 @@ def generate_requisition_pdf(ar_or_sample):
     att = _createObjectByType(
         "Attachment", ar_or_sample.aq_parent, attid)
     att.setAttachmentFile(open(pdf_fn))
+    att.setReportOption('i') # Ignore in report
+
+    # Try to assign the Requisition Attachment Type
+    query = dict(portal_type='AttachmentType', title='Requisition')
+    brains = api.search(query, 'bika_setup_catalog')
+    if brains:
+        att_type = api.get_object(brains[0])
+        att.setAttachmentType(att_type)
+
     # Awkward workaround to rename the file
     attf = att.getAttachmentFile()
     attf.filename = '%s.pdf' % filename

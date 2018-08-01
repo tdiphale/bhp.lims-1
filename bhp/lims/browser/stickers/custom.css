@@ -1,0 +1,13 @@
+/**
+This HACK to make the stickers machinery work until we don't have
+full support for ZPL (Zebra Printer Labeling) format.
+For every sticker pt we need a css with same name
+*/
+.sticker {
+    margin:0 auto;
+    padding:2mm 1mm;
+    width: 23.4mm;
+    height: 10.7mm;
+    font-family: Helvetica, Arial;
+    font-size:7pt;
+}
