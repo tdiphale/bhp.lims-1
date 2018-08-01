@@ -57,7 +57,22 @@ class RequisitionFormPdf(BrowserView):
         contact = api.get_user_contact(user)
         return contact.getFullname()
 
+    def get_contact_phone(self):
+        user = api.get_current_user()
+        contact = api.get_user_contact(user)
+        return contact.getBusinessPhone()
 
+    def get_contact_title(self):
+        user = api.get_current_user()
+        contact = api.get_user_contact(user)
+        return contact.getJobTitle()
+
+    def getDepartment(self):
+        user = api.get_current_user()
+        contact = api.get_user_contact(user)
+        return contact.getDepartment()
+
+      
 def generate_requisition_pdf(ar_or_sample):
     if not ar_or_sample:
         logger.warn("No Analysis Request or Sample provided")

@@ -9,6 +9,21 @@
             font-size:9pt;
             width:210mm;
         }
+        .comments{
+            color:black;
+            width:300px;
+
+        }
+        table th, td{
+            text-align:center;
+            padding:0px;
+            margin:auto;
+            font-size:8pt;
+        }
+        .other_details{
+            margin-top:50px;
+            margin-left: 30px;
+        }
     </style>
 </head>
 <body tal:define="
@@ -20,24 +35,35 @@
     <table cellspacing="0" cellpadding="0" width="100%">
       <tr>
         <th>Specimen</th>
-        <th>Priority</th>
-        <th>Clinic</th>
-        <th>Participant ID</th>
-        <th>Gender</th>
-        <th>Drawn date</th>
+        <th>PRIORITY</th>
+        <th>PANEL</th>
+        <th>DESCRIPTION</th>
+        <th>GENDER</th>
+        <th>DRAWN DATE</th>
       </tr>
       <tal:ar repeat="analysisrequest view/analysis_requests">
       <tr tal:define="sample python: analysisrequest.getSample();
                       client python:analysisrequest.aq_parent">
-        <td tal:content="python: analysisrequest.id"></td>
+        <td>
+           <img tal:attributes="src python:view.get_barcode(analysisrequest);"
+               style="width:150px">
+        </td>
         <td tal:content="python: analysisrequest.getPriority()"></td>
         <td tal:content="python: client.Title()"></td>
         <td tal:content="python: view.get(analysisrequest, 'ParticipantID')"></td>
         <td tal:content="python: view.get(analysisrequest, 'Gender')"></td>
-        <td tal:content="python: view.get(sample, 'DateSampled')"></td>
+        <td tal:content="python: view.get(sample, 'DateSampled').strftime('%d/%m/%y')"></td>
       </tr>
       </tal:ar>
     </table>
+    <div class="other_details">
+      <h3>Comments <span class="comments"></span></h3>
+      <h3>Initials of the site personnel completing this form <span class="comments"></span></h3>
+      <h3>Initials of person delivering to the lab:</h3>
+      <h3>Departure Time:</h3>
+      <h3>Time Specimen Received at Lab:</h3>
+      <h3>initials of lab personnel receiving the samples:</h3>
+    </div>
   </div>
 </body>
 </html>
