@@ -206,6 +206,9 @@ def setup_shipment_workflow(portal):
     update_objects(query, CATALOG_ANALYSIS_REQUEST_LISTING)
     update_objects(query, 'bika_catalog')
 
+    # Update couriers (we want Clients to have access to them)
+    update_objects(dict(portal_type='Courier'), 'portal_catalog')
+
 
 def setup_shipment_workflow_for(portal, workflow_id):
     wtool = api.get_tool("portal_workflow")
@@ -216,7 +219,7 @@ def setup_shipment_workflow_for(portal, workflow_id):
     if not sample_ordered:
         workflow.states.addState('sample_ordered')
         sample_ordered = workflow.states.sample_ordered
-    sample_ordered.title = "Sample ordered"
+    sample_ordered.title = "Ordered"
     # TODO Review role permissions when sample is ordered
     roles = ('Manager', 'LabManager', 'LabClerk', 'Owner')
     sample_ordered.setPermission(AccessContentsInformation, False, roles)
@@ -239,7 +242,7 @@ def setup_shipment_workflow_for(portal, workflow_id):
     if not sample_shipped:
         workflow.states.addState('sample_shipped')
         sample_shipped = workflow.states.sample_shipped
-    sample_shipped.title = "Sample shipped"
+    sample_shipped.title = "Shipped"
     roles = ('Manager', 'LabManager', 'LabClerk', 'Owner')
     # TODO Review role permissions when sample is shipped
     sample_shipped.setPermission(AccessContentsInformation, False, roles)
@@ -276,10 +279,10 @@ def setup_shipment_workflow_for(portal, workflow_id):
         workflow.transitions.addTransition('deliver')
     deliver_transition = workflow.transitions.deliver
     deliver_transition.setProperties(
-        title='Deliver',
+        title="Receive at reception",
         new_state_id='sample_due',
         after_script_name='',
-        actbox_name="Deliver sample",
+        actbox_name="Receive at reception",
     )
     guard_deliver = deliver_transition.guard or Guard()
     guard_props = {'guard_permissions': 'BIKA: Add Sample',
@@ -289,7 +292,12 @@ def setup_shipment_workflow_for(portal, workflow_id):
     deliver_transition.guard = guard_deliver
 
     # Change the title "Sample Due" to "Sample Delivered"
-    workflow.states.sample_due.title = "Sample delivered"
+    workflow.states.sample_due.title = "At reception"
+    # Change the title "Sample received" to "At point of testing"
+    workflow.transitions.receive.title="Receive at point of testing"
+    workflow.transitions.receive.actbox_name = "Receive at point of testing"
+    workflow.states.sample_received.title = "At point of testing"
+
 
 
 def update_role_mappings(obj_or_brain, wfs=None, reindex=True):

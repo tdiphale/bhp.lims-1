@@ -206,7 +206,7 @@ class AnalysisRequestSchemaExtender(object):
                     'scheduled_sampling':{'view': 'invisible', 'edit': 'invisible'},
                     'sampled':           {'view': 'invisible', 'edit': 'invisible'},
                     'to_be_preserved':   {'view': 'invisible', 'edit': 'invisible'},
-                    'sample_ordered':    {'view': 'invisible', 'edit': 'invisible'},
+                    'sample_ordered':    {'view': 'visible', 'edit': 'visible'},
                     'sample_due':        {'view': 'visible', 'edit': 'visible'},
                     'sample_prep':       {'view': 'visible', 'edit': 'invisible'},
                     'sample_received':   {'view': 'visible', 'edit': 'invisible'},

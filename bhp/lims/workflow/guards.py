@@ -34,6 +34,10 @@ def guard_send_to_lab(context):
     if not client.getContactFromUsername(user.id):
         return False
 
+    # If sample does not have a courier assigned, we cannot deliver
+    if not sample.Schema()['Courier'].get(sample):
+        return False
+
     return True
 
 
@@ -55,6 +59,11 @@ def guard_deliver(context):
 
     # If sample does not have a courier assigned, we cannot deliver
     if not sample.Schema()['Courier'].get(sample):
+        return False
+
+    # If the current user is a Client contact, do not allow to deliver
+    user = api.get_current_user()
+    if "Client" in user.getRoles():
         return False
 
     return True
