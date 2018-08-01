@@ -86,6 +86,22 @@
               permission="zope2.View"
               layer="bika.lims.interfaces.IBikaLIMS"
           />
+          <!-- Results report: Analysis Request -->
+          <browser:page
+              for="bika.lims.interfaces.IAnalysisRequest"
+              name="publish"
+              class="bika.lims.browser.analysisrequest.publish.AnalysisRequestPublishView"
+              permission="bika.lims.ManageAnalysisRequests"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Results report: multiple Analysis Requests-->
+          <browser:page
+              for="bika.lims.interfaces.IAnalysisRequestsFolder"
+              name="publish"
+              class="bika.lims.browser.analysisrequest.publish.AnalysisRequestPublishView"
+              permission="bika.lims.ManageAnalysisRequests"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
           <!-- After transitions handler -->
           <subscriber
               for="*
@@ -179,6 +195,22 @@
           name="sticker"
           class="bhp.lims.browser.stickers.Sticker"
           permission="zope2.View"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Results report: Analysis Request -->
+      <browser:page
+          for="bika.lims.interfaces.IAnalysisRequest"
+          name="publish"
+          class="bhp.lims.browser.publish.AnalysisRequestPublishView"
+          permission="bika.lims.ManageAnalysisRequests"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Results report: multiple Analysis Requests-->
+      <browser:page
+          for="bika.lims.interfaces.IAnalysisRequestsFolder"
+          name="publish"
+          class="bhp.lims.browser.publish.AnalysisRequestPublishView"
+          permission="bika.lims.ManageAnalysisRequests"
           layer="bika.lims.interfaces.IBikaLIMS"
       />
       <!-- After transitions handler -->
