@@ -8,7 +8,7 @@ from bika.lims import api as bapi
 _marker = object()
 
 
-def get_field_value(self, instance, field_name, default=_marker):
+def get_field_value(instance, field_name, default=_marker):
     instance = bapi.get_object(instance)
     field = instance.Schema() and instance.Schema().getField(field_name) or None
     if not field:
