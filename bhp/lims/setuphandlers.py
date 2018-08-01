@@ -56,6 +56,9 @@ def setupHandler(context):
     # Update priorities to Urgent, Routine, STAT
     update_priorities(portal)
 
+    # update analysis services (Replace % by PCT in Analysis Keywords)
+    update_services(portal)
+
     logger.info("BHP setup handler [DONE]")
 
 
@@ -345,6 +348,18 @@ def update_priorities(portal):
             # Low --> STAT
             obj.setPriority(5)
             obj.reindexObject()
+
+
+def update_services(portal):
+    logger.info("*** Updating services ***")
+    for service in portal.bika_setup.bika_analysisservices.values():
+        keyword = service.Schema().getField('Keyword').get(service)
+        if '%' in keyword:
+            keyword = keyword.replace('%', '_PCT')
+            logger.info("Replaced Analysis Keyword: {}".format(keyword))
+            service.setKeyword(keyword)
+            service.reindexObject()
+
 
 def setup_attachment_types(portal):
     """Creates two attachment types. One for requisition and another one for
