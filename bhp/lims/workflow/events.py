@@ -9,6 +9,31 @@ from bika.lims.interfaces import IAnalysisRequest, ISample
 from bika.lims.workflow import doActionFor
 from bika.lims.workflow.sample import events as sample_events
 
+def after_no_sampling_workflow(obj):
+    """ Event fired for no_sampling_workflow that makes the status of the
+    Analysis request or Sample to become sample_ordered
+    """
+    logger.info("*** Custom after_no_sampling_workflow (order) transition ***")
+
+    # Generate the requisition report
+    if IAnalysisRequest.providedBy(obj):
+
+        # Transition Analyses to sample_due
+        ans = obj.getAnalyses(full_objects=True, cancellation_state='active')
+        for analysis in ans:
+            doActionFor(analysis, 'no_sampling_workflow')
+
+        # Promote to sample
+        sample = obj.getSample()
+        if sample:
+            doActionFor(sample, 'no_sampling_workflow')
+
+        # Generate the delivery pdf
+        generate_requisition_pdf(obj)
+
+    elif ISample.providedBy(obj):
+        sample_events._cascade_transition(obj, 'no_sampling_workflow')
+
 
 def after_send_to_lab(obj):
     """ Event fired after send_to_lab transition is triggered.
@@ -26,9 +51,6 @@ def after_send_to_lab(obj):
         sample = obj.getSample()
         if sample:
             doActionFor(sample, 'send_to_lab')
-
-        # Generate the requisition pdf
-        generate_requisition_pdf(obj)
 
     elif ISample.providedBy(obj):
         sample_events._cascade_transition(obj, 'send_to_lab')
