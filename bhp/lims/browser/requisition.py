@@ -4,16 +4,12 @@
 #
 import os
 import tempfile
-from StringIO import StringIO
 from base64 import b64encode
-
 from Products.CMFPlone.utils import _createObjectByType
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-import barcode
-from barcode.codex import Code128
 from barcode.writer import ImageWriter
-from barcode import generate, EAN13, Code39
+from barcode import Code39
 from bhp.lims import logger
 from bika.lims import api
 from bika.lims.browser import BrowserView
@@ -61,7 +57,6 @@ class RequisitionFormPdf(BrowserView):
         user = api.get_current_user()
         contact = api.get_user_contact(user)
         return contact.getFullname()
-
 
 def generate_requisition_pdf(ar_or_sample):
     if not ar_or_sample:

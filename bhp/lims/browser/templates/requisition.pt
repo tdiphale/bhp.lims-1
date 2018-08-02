@@ -8,7 +8,6 @@
             font-family: 'Times New Roman',Arial, Verdana, serif;
             font-size:10pt;
             width:210mm;
-
         }
         h1 { font-size:11pt; text-transform:uppercase; }
         h2 { font-size:11pt; }
@@ -68,6 +67,7 @@
           width:76%;
           padding:22px;
         }
+
         .clearfix {
           clear:both;
         }
@@ -79,7 +79,6 @@
           font-size:10pt;
           font-weight:bold;
           padding-bottom:2px;
-
         }
         .field .value {
           font-size:14pt;
@@ -88,7 +87,6 @@
           text-transform:uppercase;
           border-radius:5px;
           text-align:center;
-
         }
         .field {
           padding:0px 10px;
@@ -173,6 +171,7 @@
           </div>
         </div>
         <div class="section" id="section_2">
+
           <h1>Section 2: Specimen information</h1>
           <div class="field-line">
             <div class="field">
@@ -196,6 +195,7 @@
           <div class="field-line">
             <div class="field">
               <div class="label">Client ID</div>
+
               <div class="value" tal:content="python: client.getClientID()"></div>
             </div>
             <div class="field">
@@ -203,7 +203,6 @@
               <div class="value" tal:content="python: client.getTaxNumber()"></div>
             </div>
             <div class="clearfix"></div>
-
             <h2>Study coordinator <br/>
               <span tal:content="python: client.Title()"></span>
               <br/>
