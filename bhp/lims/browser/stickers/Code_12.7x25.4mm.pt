@@ -1,0 +1,16 @@
+<tal:sticker define="
+     item              view/current_item;
+     sample            python:item[1];
+     show_partitions   python:context.bika_setup.getShowPartitions();
+     smart_id          python:sample.getId() if show_partitions else sample.getId();">
+
+    <div class="barcode"
+        tal:attributes="data-id smart_id;"
+        data-code="code93"
+        data-barHeight="12"
+        data-barWidth="1"
+        data-addQuietZone="true"
+        data-showHRI="true">
+    </div>
+
+</tal:sticker>

@@ -1,0 +1,249 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      i18n:domain="bhp">
+<head>
+    <style>
+        body {
+            font-family: 'Times New Roman',Arial, Verdana, serif;
+            font-size:10pt;
+            width:210mm;
+
+        }
+        h1 { font-size:11pt; text-transform:uppercase; }
+        h2 { font-size:11pt; }
+        h3 { font-size:10pt; }
+        .header {
+            text-align: center;
+            text-transform: uppercase;
+            padding:0 0 50pt;
+        }
+        .header-part {
+          float:left;
+          border:1px solid #fff;
+          margin-left: -45px;
+        }
+        .header-part.barcode-container {
+          width:25%;
+        }
+        .header-part.lab-title {
+          text-align:center;
+          width:45%;
+        }
+        .header-part.site-info {
+          text-align:right;
+        }
+        .requisition {
+            width:210mm;
+            padding: 20px;
+        }
+        .lab-title {
+          font-weight:bold;
+          font-size:12pt;
+          margin-right: 30px;
+          margin-left:-40px;
+        }
+        .lab-title .lab-address {
+          font-weight:normal;
+          font-size:10pt;
+        }
+        .site-info {
+          font-weight:bold;
+          font-size:18pt;
+        }
+        .section {
+          padding:15px;
+          margin:5px;
+          float:left;
+          border:1px solid #333;
+          border-radius:10px;
+          width:36%;
+        }
+        #section_2 {
+          height:285px;
+          float:left;
+          padding:15px;
+        }
+        #section_5 {
+          width:76%;
+          padding:22px;
+        }
+        .clearfix {
+          clear:both;
+        }
+        .field-line {
+          padding:10px 0;
+          clear:both;
+        }
+        .field .label {
+          font-size:10pt;
+          font-weight:bold;
+          padding-bottom:2px;
+
+        }
+        .field .value {
+          font-size:14pt;
+          border:1px solid #cdcdcd;
+          padding:3px 5px;
+          text-transform:uppercase;
+          border-radius:5px;
+          text-align:center;
+
+        }
+        .field {
+          padding:0px 10px;
+          float:left;
+        }
+        #dateOfBirth{
+          margin-top:30px;
+        }
+        .page-body{
+          margin-left:-65px;
+        }
+    </style>
+</head>
+<body tal:define="
+    plone_view  context/@@plone;
+    portal_url  nocall:context/portal_url;
+    portal      portal_url/getPortalObject;">
+
+  <tal:ar repeat="analysisrequest view/analysis_requests">
+    <div class="requisition"
+         tal:define="sample python:analysisrequest.getSample();
+                     client python:analysisrequest.aq_parent;">
+      <div class="page-header">
+        <div class='header-part barcode-container'>
+          <p class="lab-logo">
+              <img tal:attributes="src string:${portal/absolute_url}/images/logo_raw.png" width="150px" style="width:160px; height:80px;"/>
+          </p>
+          <h3 class="study-code" tal:content="python: client.getTaxNumber()"></h3>
+        </div>
+        <div class="header-part lab-title">
+          BOTSWANA HARVARD HIV REFERENCE LABORATORY
+          <div class="lab-address">
+            PRINCESS MARINA HOSPITAL<br/>GABORONE, BOTSWANA * TEL 3902671 EXT2126
+          </div>
+          <div>
+            <h1>Analysis Request Form</h1>
+          </div>
+        </div>
+        <div class="header-part site-info">
+          <img tal:attributes="src python:view.get_barcode(analysisrequest);"
+               style="width:200px">
+        </div>
+        <div class="clearfix"></div>
+      </div>
+
+      <div class="page-body">
+        <div class="section" >
+          <h1>Section 1: Participant information</h1>
+          <div class="field-line">
+            <div class="field">
+              <div class="label">Participant ID</div>
+              <div class="value" tal:content="python: view.get(sample, 'ParticipantID')"></div>
+            </div>
+          </div>
+          <div class="field-line">
+            <div class="field">
+              <div class="label">Other Patient Reference</div>
+              <div class="value" tal:content="python: view.get(sample, 'OtherParticipantReference')"></div>
+            </div>
+          </div>
+          <div class="field-line">
+            <div class="field">
+              <div class="label">P.Initials</div>
+              <div class="value" tal:content="python: view.get(sample, 'ParticipantInitials')"></div>
+            </div>
+            <div class="field">
+              <div class="label">Gen (M/F)</div>
+              <div class="value" tal:content="python: view.get(sample, 'Gender')"></div>
+            </div>
+            <div class="field">
+              <div class="label">Visit</div>
+              <div class="value" tal:content="python: view.get(sample, 'Visit')"></div>
+            </div>
+            <div class="field">
+              <div class="label">Fasting</div>
+              <div class="value" tal:content="python: view.get(sample, 'Fasting') and 'Y' or 'N'"></div>
+            </div>
+            <div class="field" id="dateOfBirth">
+              <div class="label">Date of Birth</div>
+              <div class="value" tal:content="python: view.get(sample, 'DateOfBirth').strftime('%d/%m/%Y')"></div>
+            </div>
+          </div>
+        </div>
+        <div class="section" id="section_2">
+          <h1>Section 2: Specimen information</h1>
+          <div class="field-line">
+            <div class="field">
+              <div class="label">Date/Time Specimen Drawn</div>
+              <div class="value" tal:content="python: view.get(sample, 'DateSampled').strftime('%d/%m/%Y %H:%M:%S')"></div>
+            </div>
+          </div>
+          <div class="field-line">
+            <div class="field">
+              <div class="label">Sample Type / Volume</div>
+              <div class="value">
+                <span tal:content="python: sample.getSampleType().Title()"></span>&nbsp;/&nbsp;
+                <span tal:content="python: view.get(sample, 'Volume')"></span>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+        <div class="section">
+          <h1>Section 3: Site information</h1>
+          <div class="field-line">
+            <div class="field">
+              <div class="label">Client ID</div>
+              <div class="value" tal:content="python: client.getClientID()"></div>
+            </div>
+            <div class="field">
+              <div class="label">Study Code</div>
+              <div class="value" tal:content="python: client.getTaxNumber()"></div>
+            </div>
+            <div class="clearfix"></div>
+
+            <h2>Study coordinator <br/>
+              <span tal:content="python: client.Title()"></span>
+              <br/>
+              <span>Botswana - Harvard Partnership</span>
+              <br/>
+              <span>Tel: 3910388</span>
+            </h2>
+          </div>
+        </div>
+        <div class="section">
+          <h1>Section 4: Requisition</h1>
+          <div class="field-line">
+            <div class="field">
+              <div class="label">Analyses</div>
+              <div>
+          <tal:service tal:repeat="analysis python: analysisrequest.getAnalyses()">
+            <div class="analysis" tal:content="python: analysis.Title"></div>
+          </tal:service>
+              </div>
+            </div>
+          </div>
+          <div class="field-line">
+            <div class="field">
+              <div class="label">Others</div>
+              <!--<div tal:content="python: view.get(sample, 'OtherInformation')"></div>-->
+            </div>
+          </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="section" id="section_5">
+          <h1>Section 5: Clinical information</h1>
+          <div class="field-line">
+            <div class="field">
+                <p tal:content="python: view.get(analysisrequest,'OtherInformation')"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="page-break"></div>
+  </tal:ar>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<object name="portal_skins">
+
+    <object name="bhp_images"
+            meta_type="Filesystem Directory View"
+            directory="bhp.lims:skins/bhp_images"/>
+
+    <object name="bhp_scripts"
+            meta_type="Filesystem Directory View"
+            directory="bhp.lims:skins/bhp_scripts"/>
+
+    <skin-path name="*">
+        <layer name="bhp_images" insert-after="custom"/>
+        <layer name="bhp_scripts" insert-after="bhp_images"/>
+    </skin-path>
+
+</object>

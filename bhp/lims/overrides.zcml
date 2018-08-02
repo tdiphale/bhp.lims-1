@@ -1,0 +1,247 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="bhp">
+
+  <configure package="Products.CMFPlone.browser">
+      <include package="z3c.unconfigure" file="meta.zcml" />
+      <unconfigure>
+          <!-- Main Analysis Requests View -->
+          <browser:page
+              for="bika.lims.interfaces.IAnalysisRequestsFolder"
+              name="base_view"
+              class="bika.lims.browser.analysisrequest.analysisrequests.AnalysisRequestsView"
+              permission="bika.lims.ManageAnalysisRequests"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Client Analysis Requests View -->
+          <browser:page
+              for="bika.lims.interfaces.IClient"
+              name="base_view"
+              class="bika.lims.browser.client.ClientAnalysisRequestsView"
+              permission="zope2.View"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Main Analysis Specs view -->
+          <browser:page
+              for="bika.lims.interfaces.IAnalysisSpecs"
+              name="folder_view"
+              class="bika.lims.controlpanel.bika_analysisspecs.AnalysisSpecsView"
+              permission="bika.lims.ManageBika"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Client Analysis Specs View -->
+          <browser:page
+              for="bika.lims.interfaces.IClient"
+              name="analysisspecs"
+              class="bika.lims.browser.client.ClientAnalysisSpecsView"
+              permission="zope2.View"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Workflow action button clicked inside Analysis Request -->
+          <browser:page
+              for="bika.lims.interfaces.IAnalysisRequest"
+              name="workflow_action"
+              class="bika.lims.browser.analysisrequest.AnalysisRequestWorkflowAction"
+              permission="zope.Public"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Workflow action button clicked inside Sample -->
+          <browser:page
+              for="bika.lims.interfaces.ISample"
+              name="workflow_action"
+              class="bika.lims.browser.analysisrequest.AnalysisRequestWorkflowAction"
+              permission="zope.Public"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Workflow action button clicked in Analysis Requests list-->
+          <browser:page
+              for="bika.lims.interfaces.IAnalysisRequestsFolder"
+              name="workflow_action"
+              class="bika.lims.browser.client.ClientWorkflowAction"
+              permission="zope.Public"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Workflow action button clicked in Samples list -->
+          <browser:page
+              for="bika.lims.interfaces.ISamplesFolder"
+              name="workflow_action"
+              class="bika.lims.browser.client.ClientWorkflowAction"
+              permission="zope.Public"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Analysis Specifications Widget -->
+          <browser:page
+              for="*"
+              name="analysis_spec_widget_view"
+              class="bika.lims.browser.widgets.analysisspecificationwidget.AnalysisSpecificationView"
+              permission="zope.Public"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Stickers preview and rendering -->
+          <browser:page
+              for="*"
+              name="sticker"
+              class="bika.lims.browser.stickers.Sticker"
+              permission="zope2.View"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Results report: Analysis Request -->
+          <browser:page
+              for="bika.lims.interfaces.IAnalysisRequest"
+              name="publish"
+              class="bika.lims.browser.analysisrequest.publish.AnalysisRequestPublishView"
+              permission="bika.lims.ManageAnalysisRequests"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Results report: multiple Analysis Requests-->
+          <browser:page
+              for="bika.lims.interfaces.IAnalysisRequestsFolder"
+              name="publish"
+              class="bika.lims.browser.analysisrequest.publish.AnalysisRequestPublishView"
+              permission="bika.lims.ManageAnalysisRequests"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- Results report. Client Analysis Requests folder -->
+          <browser:page
+              for="bika.lims.interfaces.IClient"
+              name="publish"
+              class="bika.lims.browser.analysisrequest.publish.AnalysisRequestPublishView"
+              permission="bika.lims.ManageAnalysisRequests"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
+          <!-- After transitions handler -->
+          <subscriber
+              for="*
+                   Products.DCWorkflow.interfaces.IAfterTransitionEvent"
+              handler="bika.lims.workflow.AfterTransitionEventHandler"
+           />
+          <!-- Adapter for specifications import from xls file -->
+          <adapter
+              name="Analysis_Specifications"
+              factory="bika.lims.exportimport.setupdata.Analysis_Specifications"
+              provides="bika.lims.interfaces.ISetupDataImporter"
+              for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+          />
+      </unconfigure>
+
+      <!-- Main Analysis Requests View -->
+      <browser:page
+          for="bika.lims.interfaces.IAnalysisRequestsFolder"
+          name="base_view"
+          class="bhp.lims.browser.analysisrequests.AnalysisRequestsView"
+          permission="bika.lims.ManageAnalysisRequests"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Client Analysis Requests View -->
+      <browser:page
+          for="bika.lims.interfaces.IClient"
+          name="base_view"
+          class="bhp.lims.browser.analysisrequests.ClientAnalysisRequestsView"
+          permission="zope2.View"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Main Analysis Specs view -->
+      <browser:page
+          for="bika.lims.interfaces.IAnalysisSpecs"
+          name="folder_view"
+          class="bhp.lims.browser.analysisspecsfolder.AnalysisSpecsFolderContentsView"
+          permission="bika.lims.ManageBika"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Client Analysis Specs View -->
+      <browser:page
+          for="bika.lims.interfaces.IClient"
+          name="analysisspecs"
+          class="bhp.lims.browser.analysisspecsfolder.ClientAnalysisSpecsFolderContentsView"
+          permission="zope2.View"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Workflow action button clicked inside Analysis Request -->
+      <browser:page
+          for="bika.lims.interfaces.IAnalysisRequest"
+          name="workflow_action"
+          class="bhp.lims.workflow.AnalysisRequestWorkflowAction"
+          permission="zope.Public"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Workflow action button clicked inside Sample -->
+      <browser:page
+          for="bika.lims.interfaces.ISample"
+          name="workflow_action"
+          class="bhp.lims.workflow.SampleWorkflowAction"
+          permission="zope.Public"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Workflow action button clicked in Analysis Requests lists -->
+      <browser:page
+          for="bika.lims.interfaces.IAnalysisRequestsFolder"
+          name="workflow_action"
+          class="bhp.lims.workflow.AnalysisRequestsWorkflowAction"
+          permission="zope.Public"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Workflow action button clicked in Samples list -->
+      <browser:page
+          for="bika.lims.interfaces.ISamplesFolder"
+          name="workflow_action"
+          class="bhp.lims.workflow.SamplesWorkflowAction"
+          permission="zope.Public"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Analysis Specifications Widget -->
+      <browser:page
+          for="*"
+          name="analysis_spec_widget_view"
+          class="bhp.lims.browser.analysisspecification.AnalysisSpecificationView"
+          permission="zope.Public"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Custom sticker rendering for zebra -->
+      <browser:page
+          for="*"
+          name="sticker"
+          class="bhp.lims.browser.stickers.Sticker"
+          permission="zope2.View"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Results report: Analysis Request -->
+      <browser:page
+          for="bika.lims.interfaces.IAnalysisRequest"
+          name="publish"
+          class="bhp.lims.browser.publish.AnalysisRequestPublishView"
+          permission="bika.lims.ManageAnalysisRequests"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Results report: multiple Analysis Requests-->
+      <browser:page
+          for="bika.lims.interfaces.IAnalysisRequestsFolder"
+          name="publish"
+          class="bhp.lims.browser.publish.AnalysisRequestPublishView"
+          permission="bika.lims.ManageAnalysisRequests"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Results report. Client Analysis Requests folder -->
+      <browser:page
+          for="bika.lims.interfaces.IClient"
+          name="publish"
+          class="bhp.lims.browser.publish.AnalysisRequestPublishView"
+          permission="bika.lims.ManageAnalysisRequests"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- After transitions handler -->
+      <subscriber
+          for="*
+               Products.DCWorkflow.interfaces.IAfterTransitionEvent"
+          handler="bhp.lims.workflow.AfterTransitionEventHandler"
+      />
+      <!-- Adapter for specifications import from xls file -->
+      <adapter
+          name="Analysis_Specifications"
+          factory="bhp.lims.setupdata.Analysis_Specifications"
+          provides="bika.lims.interfaces.ISetupDataImporter"
+          for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      />
+  </configure>
+
+</configure>
