@@ -38,7 +38,7 @@
         }
         .lab-title {
           font-weight:bold;
-          font-size:12pt;
+          font-size:14pt;
           margin-right: 30px;
           margin-left:-40px;
         }
@@ -98,13 +98,26 @@
         .page-body{
           margin-left:-65px;
         }
+        .document_title {
+          font-size:14pt;
+          margin-top:20px;
+        }
+        #participant_id{
+          width:140px;
+        }
+        #participant_id_value {
+           text-align:left;
+        }
+        .lab-logo {
+            margin-top: -2px;
+        }
+
     </style>
 </head>
 <body tal:define="
     plone_view  context/@@plone;
     portal_url  nocall:context/portal_url;
     portal      portal_url/getPortalObject;">
-
   <tal:ar repeat="analysisrequest view/analysis_requests">
     <div class="requisition"
          tal:define="sample python:analysisrequest.getSample();
@@ -119,10 +132,10 @@
         <div class="header-part lab-title">
           BOTSWANA HARVARD HIV REFERENCE LABORATORY
           <div class="lab-address">
-            PRINCESS MARINA HOSPITAL<br/>GABORONE, BOTSWANA * TEL 3902671 EXT2126
+            PRINCESS MARINA HOSPITAL<br/>GABORONE, BOTSWANA * TEL 3902671 EXT2126/2105
           </div>
           <div>
-            <h1>Analysis Request Form</h1>
+            <h1 class="document_title">Analysis Request Form</h1>
           </div>
         </div>
         <div class="header-part site-info">
@@ -137,8 +150,8 @@
           <h1>Section 1: Participant information</h1>
           <div class="field-line">
             <div class="field">
-              <div class="label">Participant ID</div>
-              <div class="value" tal:content="python: view.get(sample, 'ParticipantID')"></div>
+              <div class="label" id="participant_id">Participant ID</div>
+              <div class="value" id="participant_id_value" tal:content="python: view.get(sample, 'ParticipantID')"></div>
             </div>
           </div>
           <div class="field-line">
@@ -176,7 +189,7 @@
           <div class="field-line">
             <div class="field">
               <div class="label">Date/Time Specimen Drawn</div>
-              <div class="value" tal:content="python: view.get(sample, 'DateSampled').strftime('%d/%m/%Y %H:%M:%S')"></div>
+              <div class="value" tal:content="python: view.get(sample, 'DateSampled').strftime('%d/%m/%Y %H:%M')"></div>
             </div>
           </div>
           <div class="field-line">
@@ -226,14 +239,14 @@
           </div>
           <div class="field-line">
             <div class="field">
-              <div class="label">Others</div>
+              <div class="label">Others (If there's any)</div>
               <!--<div tal:content="python: view.get(sample, 'OtherInformation')"></div>-->
             </div>
           </div>
         </div>
         <div class="clearfix"></div>
         <div class="section" id="section_5">
-          <h1>Section 5: Clinical information</h1>
+          <h1>Section 5: Clinical information (Provide any notes if needed)</h1>
           <div class="field-line">
             <div class="field">
                 <p tal:content="python: view.get(analysisrequest,'OtherInformation')"></p>
