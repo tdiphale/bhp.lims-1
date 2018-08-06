@@ -244,4 +244,31 @@ class AnalysisRequestSchemaModifier(object):
         schema['DateSampled'].widget.label = _("Date Time Sampled")
         schema['ResultsRange'].subfields += ('minpanic', 'maxpanic',
                                              'calculation')
+
+        # Fields to always be hided
+        hide = ["AdHoc", "Batch", "CCContact", "CCEmails", "ClientOrderNumber",
+                "ClientReference", "Composite", "DefaultContainerType",
+                "EnvironmentalConditions", "PreparationWorkflow", "Profiles",
+                "PublicationSpecification", "SamplePoint", "SampleCondition",
+                "SamplingDate", "SamplingRound", "SamplingDeviation",
+                "ScheduledSamplingSampler", "StorageLocation", "SubGroup",]
+        for field in hide:
+            self.hide_always(schema[field])
+
         return schema
+
+    def hide_always(self, schema_field):
+        if not schema_field:
+            return
+        widget = schema_field.widget
+        if not widget:
+            return
+        visibility = widget.visible.copy() or {'edit': 'invisible',
+                                               'view': 'invisible'}
+
+        for key, value in schema_field.widget.visible.items():
+            if key in ['edit', 'view', 'add', 'header_table']:
+                visibility[key] = 'invisible'
+            elif type(value) is dict:
+                visibility[key] = {'view': 'invisible', 'edit': 'invisible'}
+        schema_field.widget.visible = visibility
