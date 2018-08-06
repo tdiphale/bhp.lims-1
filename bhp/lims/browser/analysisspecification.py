@@ -23,6 +23,10 @@ class AnalysisSpecificationView(BaseView):
         max_panic = {"title": _("Max panic"), "sortable": False}
         self.add_column('maxpanic', max_panic, after='warn_max')
 
+        calculation = {"title": _("Specification Calculation"),
+                       "sortable": False, "type": "choices"}
+        self.add_column("calculation", calculation, after='hidemax')
+
     def folderitem(self, obj, item, index):
         """Service triggered each time an item is iterated in folderitems.
 
@@ -38,11 +42,15 @@ class AnalysisSpecificationView(BaseView):
 
         nitem["minpanic"] = ""
         nitem["maxpanic"] = ""
+        nitem["calculation"] = ""
         keyword = service.getKeyword()
         if keyword in self.specsresults:
-            nitem["minpanic"] = self.specsresults[keyword].get("minpanic", "")
-            nitem["maxpanic"] = self.specsresults[keyword].get("maxpanic", "")
-        nitem["allow_edit"].extend(["minpanic", "maxpanic"])
+            specsresults = self.specsresults[keyword]
+            nitem["minpanic"] = specsresults.get("minpanic", "")
+            nitem["maxpanic"] = specsresults.get("maxpanic", "")
+            nitem["calculation"] = specsresults.get("calculation", "")
+        nitem["choices"] = { "calculation": self.get_calculations_choices()}
+        nitem["allow_edit"].extend(["minpanic", "maxpanic", "calculation"])
         return nitem
 
     def add_column(self, keyword, column, before=None, after=None):
@@ -64,3 +72,23 @@ class AnalysisSpecificationView(BaseView):
             new_columns[keyword] = column
         self.columns = new_columns
         self.review_states[0]['columns'] = self.columns.keys()
+
+    def get_calculations(self):
+        """Returns the calculations
+        """
+        query = {
+            "portal_type": "Calculation",
+            "sort_on": "sortable_title",
+            "sort_order": "ascending",
+        }
+        return api.search(query, catalog="bika_setup_catalog")
+
+    def get_calculations_choices(self):
+        """Build a list of listing specific calculation choices
+        """
+        calculations = self.get_calculations()
+        return map(
+            lambda brain: {
+                "ResultValue": api.get_uid(brain),
+                "ResultText": api.get_title(brain)},
+            calculations)

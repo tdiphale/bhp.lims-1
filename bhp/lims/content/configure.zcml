@@ -16,7 +16,6 @@
     <adapter factory=".client.ClientSchemaModifier" />
 
     <!-- Analysis Specifications -->
-    <adapter factory=".analysisspec.AnalysisSpecsSchemaExtender" />
     <adapter factory=".analysisspec.AnalysisSpecSchemaModifier" />
 
 </configure>

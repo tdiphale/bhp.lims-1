@@ -242,4 +242,6 @@ class AnalysisRequestSchemaModifier(object):
         schema['ClientSampleID'].widget.label = _("Client Sample ID (if available)")
         schema['Priority'].vocabulary = PRIORITIES
         schema['DateSampled'].widget.label = _("Date Time Sampled")
+        schema['ResultsRange'].subfields += ('minpanic', 'maxpanic',
+                                             'calculation')
         return schema
