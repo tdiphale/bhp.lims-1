@@ -12,7 +12,10 @@
      gender            python:sample.Schema().getField('Gender').get(sample).upper();
      dob               python:sample.Schema().getField('DateOfBirth').get(sample).strftime('%d/%m/%Y');
      date_sampled      python:sample.Schema().getField('DateSampled').get(sample).strftime('%d/%m/%Y %H:%M');
-     profile           python:sample.getAnalysisRequests()[0].getTemplate().Title();">
+     analysis_requests python:sample.getAnalysisRequests();
+     analysis_request  python:analysis_requests and analysis_requests[0] or None;
+     template          python:analysis_request and analysis_request.getTemplate() or None;
+     template          python:template and template.Title() or '---';">
 
     <div>
         <span tal:content="site_id"></span> <span tal:content="study_code"></span> <span tal:content="sampletype"></span>
@@ -26,7 +29,7 @@
         data-showHRI="false">
     </div>
     <div tal:content='smart_id'></div>
-    <div tal:content='profile'></div>
+    <div tal:content='template'></div>
     <div><span tal:content='pid'></span> <span tal:content='initials'></span></div>
     <div>dob: <span tal:content='dob'></span> <span tal:content='gender'></span></div>
     <div tal:content="date_sampled"></div>
