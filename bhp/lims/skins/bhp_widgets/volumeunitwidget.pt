@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      i18n:domain="bhp.lims">
+<body>
+
+<!-- Macro for read-only view -->
+<metal:view_macro define-macro="view">
+  <tal:values tal:define="values python:field.getEditAccessor(here)();
+                          session_values python:here.session_restore_value(fieldName, values);
+                          cached_values python:request.get(fieldName,session_values);
+                          values python:cached_values or values;
+                          values python:values[0] if len(values) &gt; 0 else {};">
+
+    EPI
+
+  </tal:values>
+</metal:view_macro>
+
+<!-- Macro for searches -->
+<metal:search_macro define-macro="search">
+    <div metal:use-macro="here/widgets/string/macros/edit"/>
+</metal:search_macro>
+
+<!-- Macro for edit view -->
+<metal:edit_macro define-macro="edit">
+  <metal:use use-macro="field_macro | context/widgets/field/macros/edit">
+    <metal:body_macro fill-slot="widget_body">
+      HOLA
+    </metal:body_macro>
+  </metal:use>
+</metal:edit_macro>
+
+</body>
+</html>
