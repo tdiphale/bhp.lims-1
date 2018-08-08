@@ -5,13 +5,6 @@
 
   <monkey:patch
     description=""
-    class="bika.lims.content.analysisrequest.AnalysisRequest"
-    original="getResultsRange"
-    replacement=".content.analysisrequest.getResultsRange"
-  />
-
-  <monkey:patch
-    description=""
     class="bika.lims.content.abstractroutineanalysis.AbstractRoutineAnalysis"
     original="getResultsRange"
     replacement=".content.abstractroutineanalysis.getResultsRange"

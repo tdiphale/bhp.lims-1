@@ -49,7 +49,7 @@ class AnalysisSpecificationView(BaseView):
             nitem["minpanic"] = specsresults.get("minpanic", "")
             nitem["maxpanic"] = specsresults.get("maxpanic", "")
             nitem["calculation"] = specsresults.get("calculation", "")
-        nitem["choices"] = { "calculation": self.get_calculations_choices()}
+        nitem["choices"]["calculation"] = self.get_calculations_choices()
         nitem["allow_edit"].extend(["minpanic", "maxpanic", "calculation"])
         return nitem
 

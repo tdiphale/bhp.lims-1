@@ -4,7 +4,7 @@
 #
 from bika.lims import bikaMessageFactory as _
 from bika.lims import api
-from bika.lims.api.analysis import is_out_of_range
+from bika.lims.api.analysis import is_out_of_range, get_formatted_interval
 from bika.lims.utils import get_image
 
 def _folder_item_specifications(self, analysis_brain, item):
@@ -15,15 +15,9 @@ def _folder_item_specifications(self, analysis_brain, item):
     results_range = analysis.getResultsRange()
     if not results_range:
         return
-    min_str = results_range.get('min', '')
-    max_str = results_range.get('max', '')
-    min_str = api.is_floatable(min_str) and "{0}".format(min_str) or ""
-    max_str = api.is_floatable(max_str) and "{0}".format(max_str) or ""
-    # Join with semi-colon to avoid confusion with commas as decimal mark
-    specs = "; ".join([val for val in [min_str, max_str] if val])
-    if not specs:
-        return
-    item["Specification"] = "[{}]".format(specs)
+
+    # Display the specification interval
+    item["Specification"] = get_formatted_interval(results_range, "")
 
     # Show an icon if out of range
     out_range, out_shoulders = is_out_of_range(analysis_brain)

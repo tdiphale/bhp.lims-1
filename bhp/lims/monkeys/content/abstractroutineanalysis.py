@@ -18,16 +18,16 @@ def getResultsRange(self):
     :return: A dictionary with keys "min", "max", "warn_min" and "warn_max"
     :rtype: dict
     """
+    specs = ResultsRangeDict()
     analysis_request = self.getRequest()
     if not analysis_request:
-        return ResultsRangeDict()
+        return specs
 
     keyword = self.getKeyword()
     ar_ranges = analysis_request.getResultsRange()
     # Get the result range that corresponds to this specific analysis
     an_range = [rr for rr in ar_ranges if rr.get('keyword', '') == keyword]
-
-    rr = an_range and an_range[0].copy() or {}
+    rr = an_range and an_range[0].copy() or specs
 
     # Calculated Specification
     calc_uid = rr.get("calculation")
@@ -39,4 +39,4 @@ def getResultsRange(self):
         if calc_spec:
             rr.update(calc_spec)
 
-    return ResultsRangeDict(rr)
+    return rr

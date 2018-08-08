@@ -142,9 +142,9 @@ def hide_unused_ar_fields(portal):
                            "ClientOrderNumber", "ClientReference",
                            "Composite", "Contact", "DefaultContainerType",
                            "EnvironmentalConditions", "InvoiceExclude",
-                           "PreparationWorkflow", "Sample", "Profiles",
-                           "SampleCondition", "SamplePoint", "Sampler",
-                           "SamplingDate", "SamplingDeviation", "SamplingRound",
+                           "Sample", "Profiles", "SampleCondition",
+                           "SamplePoint", "Sampler", "SamplingDate",
+                           "SamplingDeviation", "SamplingRound",
                            "Specification", "StorageLocation", "SubGroup",]
 
     bika_setup = portal.bika_setup
@@ -172,7 +172,7 @@ def sort_ar_fields(portal):
             'StorageLocation', 'ClientOrderNumber', 'ClientReference',
             'SamplingDeviation', 'SampleCondition', 'Priority',
             'EnvironmentalConditions', 'DefaultContainerType', 'AdHoc',
-            'Composite', 'InvoiceExclude', 'PreparationWorkflow']
+            'Composite', 'InvoiceExclude',]
 
     bika_setup = portal.bika_setup
     annotation = IAnnotations(bika_setup)
@@ -485,7 +485,9 @@ def import_specifications(portal):
         keyword = service.getKeyword()
         specs_dict = {
             'keyword': keyword,
+            'min_operator': 'geq',
             'min': '0',
+            'max_operator': 'lt',
             'max': '0',
             'minpanic': '',
             'maxpanic': '',

@@ -248,7 +248,7 @@ class AnalysisRequestSchemaModifier(object):
         # Fields to always be hided
         hide = ["AdHoc", "Batch", "CCContact", "CCEmails", "ClientOrderNumber",
                 "ClientReference", "Composite", "DefaultContainerType",
-                "EnvironmentalConditions", "PreparationWorkflow", "Profiles",
+                "EnvironmentalConditions", "Profiles",
                 "PublicationSpecification", "SamplePoint", "SampleCondition",
                 "SamplingDate", "SamplingRound", "SamplingDeviation",
                 "ScheduledSamplingSampler", "StorageLocation", "SubGroup",]
