@@ -333,8 +333,8 @@
     <div class="small-separator">&nbsp;</div>
     <div>
         <div><span class="label">Lab Quality: </span>Thabani Ncube</div>
-        <div><span class="label">Lab Manager: </span>Terrence Mohammed</div>
-        <div><span class="label">Lab Director: </span>Sikhulile Moyo</div>
+        <div><span class="label">Lab Manager: </span>Terence Mohammed</div>
+        <div><span class="label">Lab Directors: </span>Sikhulile Moyo and Simani Gaseitsiwe</div>
     </div>
     <table>
         <td tal:define="mngr_info analysisrequest/managers;
