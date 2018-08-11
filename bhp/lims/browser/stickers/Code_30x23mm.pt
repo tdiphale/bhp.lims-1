@@ -3,7 +3,7 @@
      sample            python:item[1];
      client            python:sample.aq_parent;
      study_code        python:client.getTaxNumber();
-     site_id           python:client.id;
+     site_id           python:client.getClientID();
      show_partitions   python:context.bika_setup.getShowPartitions();
      smart_id          python:sample.getId() if show_partitions else sample.getId();
      initials          python:sample.Schema().getField('ParticipantInitials').get(sample);
@@ -28,8 +28,10 @@
         data-addQuietZone="true"
         data-showHRI="false">
     </div>
-    <div tal:content='smart_id'></div>
-    <div tal:content='template'></div>
+    <div>
+        <span tal:content="smart_id"></span>&nbsp;&nbsp;
+        <span tal:content="template"></span>
+    </div>
     <div><span tal:content='pid'></span> <span tal:content='initials'></span></div>
     <div>dob: <span tal:content='dob'></span> <span tal:content='gender'></span></div>
     <div tal:content="date_sampled"></div>
