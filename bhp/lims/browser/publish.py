@@ -22,7 +22,7 @@ class AnalysisRequestPublishView(_AnalysisRequestPublishView):
         return api.get_field_value(instance, field_name, default)
 
     def get_age(self, instance):
-        dob = get_field_value(instance, "DateOfBith")
+        dob = get_field_value(instance, "DateOfBirth")
         sampled = instance.getDateSampled()
         if not dob or not sampled:
             return ''
