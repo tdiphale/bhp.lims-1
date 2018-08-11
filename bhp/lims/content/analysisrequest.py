@@ -15,6 +15,7 @@ from bika.lims.browser.fields.proxyfield import ExtProxyField
 from bika.lims.browser.widgets import DateTimeWidget
 from bika.lims.browser.widgets import SelectionWidget
 from bika.lims.browser.widgets.referencewidget import ReferenceWidget
+from bika.lims.fields import ExtBooleanField
 from bika.lims.interfaces import IAnalysisRequest
 from zope.component import adapts
 from zope.interface import implements
@@ -220,6 +221,53 @@ class AnalysisRequestSchemaExtender(object):
                 catalog_name='portal_catalog',
                 base_query={'review_state': 'active'},
                 showOn=True,
+            ),
+        ),
+
+        # This Analysis Request is only for internal use?
+        # This field is useful when we create Partitions (AR-like), so we don't
+        # want the client to see Analysis Requests / Samples that are meant to
+        # be used in the lab.
+        ExtProxyField(
+            "InternalUse",
+            proxy="context.getSample()",
+            mode="rw",
+            required=0,
+            default=False,
+            widget=BooleanWidget(
+                format="radio",
+                label=_("Internal use"),
+                render_own_label=True,
+                visible={'edit': 'visible',
+                         'view': 'visible',
+                         'add': 'edit',
+                         'header_table': 'visible'},
+            ),
+        ),
+        ExtProxyField(
+            "PrimarySample",
+            proxy="context.getSample()",
+            required=0,
+            allowed_types=('Sample'),
+            relationship='SamplePrimarySample',
+            mode="rw",
+            read_permission=View,
+            write_permission=ModifyPortalContent,
+            widget=ReferenceWidget(
+                label=_("Primary Sample"),
+                description=_("The sample this is originated from"),
+                size=20,
+                render_own_label=True,
+                visible={
+                    'view': 'visible',
+                    'edit': 'invisible',
+                    'add': 'invisible',
+                    'header_table': 'visible',
+                    'secondary': 'disabled',
+                },
+                catalog_name='bika_catalog',
+                base_query={'review_state': 'active'},
+                showOn=False,
             ),
         ),
     ]

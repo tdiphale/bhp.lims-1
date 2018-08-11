@@ -12,17 +12,17 @@
 
   <monkey:patch
     description=""
-    class="bika.lims.browser.analyses.view.AnalysesView"
-    original="_folder_item_specifications"
-    replacement=".browser.analyses._folder_item_specifications"
-  />
-
-  <monkey:patch
-    description=""
     class="bika.lims.content.calculation.Calculation"
     original="calculate_result"
     ignoreOriginal="True"
     replacement=".content.calculation.calculate_result"
+  />
+
+  <monkey:patch
+    description=""
+    class="bika.lims.browser.analyses.view.AnalysesView"
+    original="_folder_item_specifications"
+    replacement=".browser.analyses._folder_item_specifications"
   />
 
 </configure>

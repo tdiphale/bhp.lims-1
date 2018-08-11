@@ -54,12 +54,14 @@ def setupHandler(context):
     # Setup Attachment Types (requisition + delivery)
     setup_attachment_types(portal)
 
-    # TODO move to upgradesteps
     # Update priorities to Urgent, Routine, STAT
     update_priorities(portal)
 
     # update analysis services (Replace % by PCT in Analysis Keywords)
     update_services(portal)
+
+    # Update InternalUse for Samples and Analysis Requests
+    update_internal_use(portal)
 
     # Import specifications from bhp/lims/resources/results_ranges.xlsx
     import_specifications(portal)
@@ -302,10 +304,9 @@ def setup_shipment_workflow_for(portal, workflow_id):
     # Change the title "Sample Due" to "Sample Delivered"
     workflow.states.sample_due.title = "At reception"
     # Change the title "Sample received" to "At point of testing"
-    workflow.transitions.receive.title="Receive at point of testing"
-    workflow.transitions.receive.actbox_name = "Receive at point of testing"
+    workflow.transitions.receive.title="Process"
+    workflow.transitions.receive.actbox_name = "Process"
     workflow.states.sample_received.title = "At point of testing"
-
 
 
 def update_role_mappings(obj_or_brain, wfs=None, reindex=True):
@@ -408,10 +409,13 @@ def setup_attachment_types(portal):
                     attachment.setReportOption('i') # Ignore in report
                     break
 
+
 def import_specifications(portal):
     """Creates (or updates) dynamic specifications from
     resources/results_ranges.xlsx
     """
+
+    logger.info("*** Importing specifications ***")
 
     def get_bs_object(xlsx_row, xlsx_keyword, portal_type, criteria):
         text_value = xlsx_row.get(xlsx_keyword, None)
@@ -502,3 +506,14 @@ def import_specifications(portal):
         ranges = filter(lambda val: val.get('keyword') != keyword, ranges)
         ranges.append(specs_dict)
         aspec.setResultsRange(ranges)
+
+
+def update_internal_use(portal):
+    """Walks through all Samples and assigns its value to False if no value set
+    """
+    logger.info("*** Updating InternalUse field on Samples/ARs ***")
+    samples = api.search(dict(portal_type="Sample"), "bika_catalog")
+    for sample in samples:
+        sample = api.get_object(sample)
+        if _api.get_field_value(sample, "InternalUse", None) is None:
+            _api.set_field_value(sample, "InternalUse", False)

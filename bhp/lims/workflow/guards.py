@@ -24,19 +24,18 @@ def guard_send_to_lab(context):
     if not api.is_active(sample):
         return False
 
-    # Only users from role Client can send the sample to the lab
-    user = api.get_current_user()
-    if "Client" not in user.getRoles():
-        return False
-
-    # Only contacts from the client the Sample belongs to
-    client = sample.aq_parent
-    if not client.getContactFromUsername(user.id):
-        return False
-
     # If sample does not have a courier assigned, we cannot deliver
     if not sample.Schema()['Courier'].get(sample):
         return False
+
+    # Only users from role Client can send the sample to the lab
+    user = api.get_current_user()
+    user_roles = user.getRoles()
+    # Only contacts from the client the Sample belongs to
+    if "Client" in user_roles:
+        client = sample.aq_parent
+        if not client.getContactFromUsername(user.id):
+            return False
 
     return True
 

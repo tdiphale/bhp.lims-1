@@ -207,6 +207,55 @@ class SampleSchemaExtender(object):
                 showOn=True,
             )
         ),
+
+        # This Analysis Request is only for internal use?
+        # This field is useful when we create Partitions (AR-like), so we don't
+        # want the client to see Analysis Requests / Samples that are meant to
+        # be used in the lab.
+        ExtBooleanField(
+            "InternalUse",
+            required=0,
+            default=False,
+            widget=BooleanWidget(
+                format="radio",
+                label=_("Internal use"),
+                render_own_label=True,
+                visible={
+                    'view': 'visible',
+                    'edit': 'invisible',
+                    'add': 'invisible',
+                    'header_table': 'visible',
+                    'secondary': 'disabled',}
+            ),
+        ),
+
+        ExtReferenceField(
+            "PrimarySample",
+            multiValue=0,
+            allowed_types=("Sample"),
+            relationship="SamplePrimarySample",
+            referenceClass=HoldingReference,
+            mode="rw",
+            read_permission=View,
+            write_permission=ModifyPortalContent,
+            widget=ReferenceWidget(
+                label=_("Primary Sample"),
+                description=_("The sample this is originated from"),
+                size=20,
+                render_own_label=True,
+                visible={
+                    'view': 'visible',
+                    'edit': 'invisible',
+                    'add': 'invisible',
+                    'header_table': 'visible',
+                    'secondary': 'disabled',
+                },
+                catalog_name='bika_catalog',
+                base_query={'review_state': 'active'},
+                showOn=False,
+            ),
+        ),
+
     ]
 
 

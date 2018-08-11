@@ -54,4 +54,29 @@
       layer="bika.lims.interfaces.IBikaLIMS"
   />
 
+  <!-- Main Analysis Requests View -->
+  <browser:page
+      for="bika.lims.interfaces.IAnalysisRequestsFolder"
+      name="base_view"
+      class="bhp.lims.browser.analysisrequests.AnalysisRequestsView"
+      permission="bika.lims.ManageAnalysisRequests"
+      layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+  <!-- Client Analysis Requests View -->
+  <browser:page
+      for="bika.lims.interfaces.IClient"
+      name="base_view"
+      class="bhp.lims.browser.analysisrequests.ClientAnalysisRequestsView"
+      permission="zope2.View"
+      layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+  <!-- Client Samples View -->
+  <browser:page
+      for="bika.lims.interfaces.IClient"
+      name="samples"
+      class="bhp.lims.browser.samples.ClientSamplesView"
+      permission="zope2.View"
+      layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
 </configure>

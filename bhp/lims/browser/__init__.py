@@ -13,6 +13,8 @@ def add_transition(listing, transition_id, review_state_ids=None):
     new_states = []
     for state in listing.review_states:
         if state['id'] in review_state_ids:
+            if 'transitions' not in state:
+                state['transitions']=list()
             state['transitions'].append(dict(id=transition_id))
         new_states.append(state)
     listing.review_states = new_states

@@ -4,6 +4,7 @@
 #
 import re
 
+from bhp.lims import logger
 from DateTime import DateTime
 from Products.ATContentTypes.utils import DT2dt
 from bika.lims import api as bapi
@@ -22,6 +23,20 @@ def get_field_value(instance, field_name, default=_marker):
             return default
         bapi.fail("No field {} found for {}".format(field_name, repr(instance)))
     return instance.Schema().getField(field_name).get(instance)
+
+
+def set_field_value(instance, field_name, value):
+    """Sets the value to a Schema field
+    """
+    if field_name == "id":
+        logger.warn("Assignment of id is not allowed")
+        return
+    logger.info("Field {} = {}".format(field_name, repr(value)))
+    instance = bapi.get_object(instance)
+    field = instance.Schema() and instance.Schema().getField(field_name) or None
+    if not field:
+        bapi.fail("No field {} found for {}".format(field_name, repr(instance)))
+    field.set(instance, value)
 
 
 def get_age(datetime_from, datetime_to=None):
