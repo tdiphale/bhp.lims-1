@@ -14,55 +14,216 @@
             width:300px;
 
         }
+        table {
+            border: 1px black solid;
+            border-radius: 10px;
+            margin-top:10px;
+            margin-left: -30px;
+            width:700px;
+
+        }
+        table th {
+            margin-top: 10px;
+        }
         table th, td{
             text-align:center;
-            padding:0px;
-            margin:auto;
+            padding:5px;
             font-size:8pt;
         }
-        .other_details{
+        .other_details {
             margin-top:50px;
-            margin-left: 30px;
+            margin-left: -30px;
+            border: 1px solid black ;
+            border-radius: 10px;
+            padding:10px;
+            width: 680px;
         }
+        .lab-title {
+          font-weight:bold;
+          font-size:14pt;
+          margin-right: 30px;
+          margin-left:-30px;
+
+        }
+        .lab-title .lab-address {
+          font-weight:normal;
+          font-size:10pt;
+        }
+        .site-info {
+          font-weight:bold;
+          font-size:18pt;
+        }
+        .header {
+            text-align: center;
+            text-transform: uppercase;
+            padding:0 0 40pt;
+        }
+        .header-part {
+          float:left;
+          border:1px solid #fff;
+          margin-left: 0px;
+        }
+
+         .header-part.site-info {
+          text-align:right;
+        }
+        .header-part .barcode-container {
+          width:25%;
+        }
+        .header-part.lab-title {
+          text-align:center;
+          width:45%;
+          margin-left:10px;
+        }
+        .header-part.site-info {
+          text-align:right;
+          margin-left: -10px;
+        }
+        .line_comments {
+            width: 50%;
+            height: 47px;
+            border-bottom: 1px solid black;
+            position: fixed;
+            margin-top: -30px;
+
+
+        }
+        .line_comments_continuation {
+            width: 50%;
+            height: 47px;
+            border-bottom: 1px solid black;
+            position: fixed;
+            margin-top: -30px;
+            margin-left: 73px;
+
+
+        }
+        .line_initials_site_personnel {
+            width: 30%;
+            height: 47px;
+            border-bottom: 1px solid black;
+            position: fixed;
+            margin-top: -30px;
+
+
+        }
+        .line_intials_personnel_delivering {
+            width: 36%;
+            height: 47px;
+            border-bottom: 1px solid black;
+            position: fixed;
+            margin-top: -30px;
+
+
+        }
+        .initials {
+            margin-top: 50px;
+        }
+        .line_depart_time {
+            width: 47%;
+            padding: 1px;
+            height: 47px;
+            border-bottom: 1px solid black;
+            position: fixed;
+            margin-top: -30px;
+        }
+        .line_time_specimen_received {
+            width: 39%;
+            height: 47px;
+            border-bottom: 1px solid black;
+            position: fixed;
+            margin-top: -30px;
+        }
+        .line_personnel_receiving {
+            width: 32%;
+            height: 47px;
+            border-bottom: 1px solid black;
+            position: fixed;
+            margin-top: -30px;
+        }
+        .checkbox {
+            width: 25px;
+            height: 20px;
+            border: 1px black solid;
+            border-radius: 5px;
+            margin-right:40px;
+        }
+        .clearfix {
+            clear:both;
+        }
+        .page-header {
+            margin-left: -50px;
+          }
     </style>
 </head>
 <body tal:define="
     plone_view  context/@@plone;
     portal_url  nocall:context/portal_url;
-    portal      portal_url/getPortalObject;">
+    portal      portal_url/getPortalObject;
+    analysisrequest view/analysis_requests;
+    client python:analysisrequest[0].aq_parent;
+">
 
   <div class="delivery">
+<div class="page-header">
+         <div class='header-part barcode-container'>
+          <p class="lab-logo">
+              <img tal:attributes="src string:${portal/absolute_url}/images/logo_raw.png" width="150px" style="width:160px; height:80px;"/>
+          </p>
+        </div>
+        <div class="header-part lab-title">
+          BOTSWANA HARVARD HIV REFERENCE LABORATORY
+          <div class="lab-address">
+            PRINCESS MARINA HOSPITAL<br/>GABORONE, BOTSWANA * TEL 3902671 EXT2126/2105
+          </div>
+          <div>
+            <h4>Delivery Checklist Form</h4>
+          </div>
+        </div>
+        <div class="header-part site-info">
+         <h5 tal:content="python: client.getTaxNumber()"></h5>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+
     <table cellspacing="0" cellpadding="0" width="100%">
       <tr>
-        <th>Specimen</th>
-        <th>PRIORITY</th>
-        <th>PANEL</th>
-        <th>DESCRIPTION</th>
-        <th>GENDER</th>
-        <th>DRAWN DATE</th>
+          <th>Specimen</th>
+          <th>PRIORITY</th>
+          <th>PANEL</th>
+          <th>PID</th>
+          <th>GENDER</th>
+          <th>DRAWN DATE</th>
+          <th>VISIT</th>
       </tr>
       <tal:ar repeat="analysisrequest view/analysis_requests">
       <tr tal:define="sample python: analysisrequest.getSample();
                       client python:analysisrequest.aq_parent">
-        <td>
-           <img tal:attributes="src python:view.get_barcode(analysisrequest);"
-               style="width:150px">
-        </td>
-        <td tal:content="python: analysisrequest.getPriority()"></td>
-        <td tal:content="python: client.Title()"></td>
-        <td tal:content="python: view.get(analysisrequest, 'ParticipantID')"></td>
-        <td tal:content="python: view.get(analysisrequest, 'Gender')"></td>
-        <td tal:content="python: view.get(sample, 'DateSampled').strftime('%d/%m/%y')"></td>
+          <td>
+            <div>
+                <input type="checkbox">
+                <span tal:content="python: analysisrequest.id"></span>
+            </div>
+          </td>
+          <td tal:content="python: analysisrequest.getPriority()"></td>
+          <td tal:content="python: view.get(analysisrequest, 'Template').Title()"></td>
+          <td>
+              <span tal:content="python: view.get(analysisrequest, 'ParticipantID')"></span>
+          </td>
+          <td tal:content="python: view.get(analysisrequest, 'Gender').upper()"></td>
+          <td tal:content="python: view.get(sample, 'DateSampled').strftime('%d/%m/%y')"></td>
+          <td tal:content="python: view.get(analysisrequest, 'Visit').upper()"></td>
       </tr>
       </tal:ar>
     </table>
     <div class="other_details">
-      <h3>Comments <span class="comments"></span></h3>
-      <h3>Initials of the site personnel completing this form <span class="comments"></span></h3>
-      <h3>Initials of person delivering to the lab:</h3>
-      <h3>Departure Time:</h3>
-      <h3>Time Specimen Received at Lab:</h3>
-      <h3>initials of lab personnel receiving the samples:</h3>
+        <h3>Comments <span class="line_comments"></span></h3>
+        <h3 class="line_comments_continuation"></h3>
+        <h3 class="initials">Initials of the site personnel completing this form <span class="line_initials_site_personnel"></span></h3>
+        <h3>Initials of person delivering to the lab: <span class="line_intials_personnel_delivering"></span></h3>
+        <h3>Departure Time:<span class="line_depart_time"></span></h3>
+        <h3>Time Specimen Received at Lab:<span class="line_time_specimen_received"></span></h3>
+        <h3>initials of lab personnel receiving the samples:<span class="line_personnel_receiving"></span></h3>
     </div>
   </div>
 </body>

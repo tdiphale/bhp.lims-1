@@ -4,7 +4,6 @@
 #
 import os
 import tempfile
-from base64 import b64encode
 from Products.CMFPlone.utils import _createObjectByType
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
@@ -14,8 +13,6 @@ from bika.lims.browser import BrowserView
 from bika.lims.idserver import renameAfterCreation
 from bika.lims.interfaces import IAnalysisRequest, ISample
 from bika.lims.utils import createPdf
-from barcode.writer import ImageWriter
-from barcode import Code39
 
 
 class DeliveryFormPdf(BrowserView):
@@ -41,15 +38,6 @@ class DeliveryFormPdf(BrowserView):
         contact = api.get_user_contact(user)
         return contact.getFullname()
 
-    def get_barcode(self, instance):
-        ean = Code39(u''+str(instance.id), writer=ImageWriter())
-        barcode_img = tempfile.mktemp(suffix='.png')
-        localFile = open(barcode_img, 'w')
-        ean.write(localFile)
-        localFile.close()
-        img = open(barcode_img, 'r')
-        img_str = img.read()
-        return "data:image/png;base64,{}".format(b64encode(img_str))
 
 def generate_delivery_pdf(ar_or_sample):
     if not ar_or_sample:
