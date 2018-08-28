@@ -119,20 +119,25 @@ def setup_id_formatting(portal):
         bs.setIDFormatting(ids)
 
     # Sample ID format
-    set_format(dict(form='{seq:06d}',
+    # Format:
+    #   08502AAA01
+    # Where:
+    #   - 085: Client's Study ID
+    #   - 02: Sample Type prefix (e.g. for Whole blood)
+    #   - AAA01: Alphanumeric numbering
+    set_format(dict(form='{studyId}{sampleType}{alpha:3a2d}',
                     portal_type='Sample',
                     prefix='sample',
                     sequence_type='generated',
-                    split_length=1,
+                    split_length=2,
                     value=''))
 
     # Analysis Request ID format
-    set_format(dict(form='{sampleId}R{seq:d}',
-                    context='sample',
+    set_format(dict(form='{primarySampleId}{seq:02d}',
                     portal_type='AnalysisRequest',
-                    counter_reference='AnalysisRequestSample',
-                    counter_type='backreference',
-                    sequence_type='counter',
+                    prefix='sample',
+                    sequence_type='generated',
+                    split_length=1,
                     value=''))
 
 

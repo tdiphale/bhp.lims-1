@@ -25,4 +25,11 @@
     replacement=".browser.analyses._folder_item_specifications"
   />
 
+  <monkey:patch
+    description=""
+    class="bika.lims.idserver"
+    original="get_variables"
+    replacement=".idserver.get_variables"
+  />
+
 </configure>
