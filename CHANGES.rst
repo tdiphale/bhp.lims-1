@@ -4,6 +4,7 @@ Changelog
 1.0.0 (unreleased)
 ------------------
 
+- #52 Analysis request has to allow selecting a container type for a sample
 - #24 Auto-print stickers on register
 - #14 Date Sampled -> Date Time Sampled
 - #22 Reduce 'Priority' to 3 options: Urgent, Routine, STAT

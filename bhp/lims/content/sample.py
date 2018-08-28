@@ -255,7 +255,6 @@ class SampleSchemaExtender(object):
                 showOn=False,
             ),
         ),
-
     ]
 
 

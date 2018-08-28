@@ -32,4 +32,11 @@
     replacement=".idserver.get_variables"
   />
 
+  <monkey:patch
+    description=""
+    class="bika.lims.browser.analysisrequest.add2.AnalysisRequestManageView"
+    original="flush"
+    replacement=".browser.analysisrequest.add2.flush"
+  />
+
 </configure>
