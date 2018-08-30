@@ -21,6 +21,7 @@ from bika.lims.permissions import CancelAndReinstate, EditFieldResults, \
 from bika.lims.utils import tmpID
 from zope.annotation.interfaces import IAnnotations
 
+AR_CONFIGURATION_STORAGE = "bika.lims.browser.analysisrequest.manage.add"
 
 def setupHandler(context):
     """BHP setup handler
@@ -42,11 +43,11 @@ def setupHandler(context):
     # Apply ID format to content types
     setup_id_formatting(portal)
 
-    # Hide unused AR Fields
-    hide_unused_ar_fields(portal)
-
     # Sort AR fields (AR Add)
     sort_ar_fields(portal)
+
+    # Hide unused AR Fields
+    hide_unused_ar_fields(portal)
 
     # Setup specimen shipment (from clinic) workflow
     setup_shipment_workflow(portal)
@@ -119,68 +120,95 @@ def setup_id_formatting(portal):
         bs.setIDFormatting(ids)
 
     # Sample ID format
-    set_format(dict(form='{seq:06d}',
+    # Format:
+    #   08502AAA01
+    # Where:
+    #   - 085: Client's Study ID
+    #   - 02: Sample Type prefix (e.g. for Whole blood)
+    #   - AAA01: Alphanumeric numbering
+    set_format(dict(form='{studyId}{sampleType}{alpha:3a2d}',
                     portal_type='Sample',
+                    prefix='sample',
+                    sequence_type='generated',
+                    split_length=2,
+                    value=''))
+
+    # Analysis Request ID format
+    set_format(dict(form='{primarySampleId}{seq:02d}',
+                    portal_type='AnalysisRequest',
                     prefix='sample',
                     sequence_type='generated',
                     split_length=1,
                     value=''))
 
-    # Analysis Request ID format
-    set_format(dict(form='{sampleId}R{seq:d}',
-                    context='sample',
-                    portal_type='AnalysisRequest',
-                    counter_reference='AnalysisRequestSample',
-                    counter_type='backreference',
-                    sequence_type='counter',
-                    value=''))
 
+def get_manage_add_storage(portal):
+    bika_setup = portal.bika_setup
+    annotation = IAnnotations(bika_setup)
+    storage = annotation.get(AR_CONFIGURATION_STORAGE)
+    if storage is None:
+        annotation[AR_CONFIGURATION_STORAGE] = OOBTree()
+    return annotation[AR_CONFIGURATION_STORAGE]
+
+
+def update_manage_add_storage(portal, storage):
+    bika_setup = portal.bika_setup
+    annotation = IAnnotations(bika_setup)
+    annotation[AR_CONFIGURATION_STORAGE] = storage
+
+def flush_manage_add_storage(portal):
+    bika_setup = portal.bika_setup
+    annotation = IAnnotations(bika_setup)
+    if annotation[AR_CONFIGURATION_STORAGE]:
+        del annotation[AR_CONFIGURATION_STORAGE]
 
 def hide_unused_ar_fields(portal):
     """Hides unused fields from AR Add Form
     """
     logger.info("*** Hiding default fields from AR Add ***")
-    field_names_to_hide = ["AdHoc", "Batch", "CCContact", "CCEmails",
-                           "ClientOrderNumber", "ClientReference",
-                           "Composite", "Contact", "DefaultContainerType",
-                           "EnvironmentalConditions", "InvoiceExclude",
-                           "Sample", "Profiles", "SampleCondition",
-                           "SamplePoint", "Sampler", "SamplingDate",
-                           "SamplingDeviation", "SamplingRound",
-                           "Specification", "StorageLocation", "SubGroup",]
+    field_names_to_hide = ["Sample",
+                           "RejectionReasons",
+                           "Specification",
+                           "InternalUse"]
 
-    bika_setup = portal.bika_setup
-    annotation = IAnnotations(bika_setup)
-    AR_CONFIGURATION_STORAGE = "bika.lims.browser.analysisrequest.manage.add"
-    storage = annotation.get(AR_CONFIGURATION_STORAGE, OOBTree())
-
+    storage = get_manage_add_storage(portal)
     visibility = storage.get('visibility', {}).copy()
-    for field_name in visibility.keys():
+    ordered = storage.get('order', [])
+    fields = list(set(visibility.keys() + field_names_to_hide + ordered))
+    for field_name in fields:
         visibility[field_name] = field_name not in field_names_to_hide
     storage.update({"visibility": visibility})
-    annotation[AR_CONFIGURATION_STORAGE] = storage
+    update_manage_add_storage(portal, storage)
 
 
 def sort_ar_fields(portal):
     """Sort AR fields from AR Add Form
     """
     logger.info("*** Sorting fields from AR Add ***")
-    sorted=['Client', 'Contact', 'ParticipantID', 'OtherParticipantReference',
-            'ParticipantInitials', 'Gender', 'Visit', 'DateOfBirth', 'Fasting',
-            'ClientSampleID', 'DateSampled', 'SampleType', 'Volume', 'Profiles',
-            'Template', 'OtherInformation', '_ARAttachment', 'CCContact',
-            'CCEmails', 'Sample', 'Batch', 'SamplingRound', 'SubGroup',
-            'Sampler', 'SamplingDate', 'Specification', 'SamplePoint',
-            'StorageLocation', 'ClientOrderNumber', 'ClientReference',
-            'SamplingDeviation', 'SampleCondition', 'Priority',
-            'EnvironmentalConditions', 'DefaultContainerType', 'AdHoc',
-            'Composite', 'InvoiceExclude',]
+    sorted=['Client',
+            'Contact',
+            'ParticipantID',
+            'OtherParticipantReference',
+            'ParticipantInitials',
+            'Gender',
+            'Visit',
+            'DateOfBirth',
+            'Fasting',
+            'ClientSampleID',
+            'DateSampled',
+            'SampleType',
+            'Volume',
+            'DefaultContainerType',
+            'Template',
+            'OtherInformation',
+            '_ARAttachment',
+            'Priority',
+            'Remarks',
+            ]
 
-    bika_setup = portal.bika_setup
-    annotation = IAnnotations(bika_setup)
-    AR_CONFIGURATION_STORAGE = "bika.lims.browser.analysisrequest.manage.add"
-    storage = annotation.get(AR_CONFIGURATION_STORAGE, OOBTree())
+    storage = get_manage_add_storage(portal)
     storage.update({"order": sorted})
+    update_manage_add_storage(portal, storage)
 
 
 def setup_shipment_workflow(portal):

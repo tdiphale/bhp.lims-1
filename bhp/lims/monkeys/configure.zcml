@@ -25,4 +25,18 @@
     replacement=".browser.analyses._folder_item_specifications"
   />
 
+  <monkey:patch
+    description=""
+    class="bika.lims.idserver"
+    original="get_variables"
+    replacement=".idserver.get_variables"
+  />
+
+  <monkey:patch
+    description=""
+    class="bika.lims.browser.analysisrequest.add2.AnalysisRequestManageView"
+    original="flush"
+    replacement=".browser.analysisrequest.add2.flush"
+  />
+
 </configure>
