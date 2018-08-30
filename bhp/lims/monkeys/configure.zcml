@@ -1,0 +1,28 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:monkey="http://namespaces.plone.org/monkey"
+    i18n_domain="bhp">
+
+  <monkey:patch
+    description=""
+    class="bika.lims.content.abstractroutineanalysis.AbstractRoutineAnalysis"
+    original="getResultsRange"
+    replacement=".content.abstractroutineanalysis.getResultsRange"
+  />
+
+  <monkey:patch
+    description=""
+    class="bika.lims.content.calculation.Calculation"
+    original="calculate_result"
+    ignoreOriginal="True"
+    replacement=".content.calculation.calculate_result"
+  />
+
+  <monkey:patch
+    description=""
+    class="bika.lims.browser.analyses.view.AnalysesView"
+    original="_folder_item_specifications"
+    replacement=".browser.analyses._folder_item_specifications"
+  />
+
+</configure>

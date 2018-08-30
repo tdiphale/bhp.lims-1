@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright 2018 Botswana Harvard Partnership (BHP)
-
+from Products.CMFCore.utils import getToolByName
+from Products.CMFPlone.utils import _createObjectByType
+from bhp.lims import api as _api
 from bhp.lims import logger
 from bhp.lims.browser.delivery import generate_delivery_pdf
 from bhp.lims.browser.requisition import generate_requisition_pdf
-from bika.lims.interfaces import IAnalysisRequest, ISample
+from bika.lims import api
+from bika.lims.idserver import renameAfterCreation
+from bika.lims.interfaces import IAnalysisRequest, ISample, IProxyField
+from bika.lims.utils import tmpID, changeWorkflowState
+from bika.lims.utils.samplepartition import create_samplepartition
 from bika.lims.workflow import doActionFor
 from bika.lims.workflow.sample import events as sample_events
 
@@ -30,6 +36,14 @@ def after_no_sampling_workflow(obj):
 
         # Generate the delivery pdf
         generate_requisition_pdf(obj)
+
+        # Set specifications by default
+        sample_type = obj.getSampleType().Title()
+        specs_title = "{} - calculated".format(sample_type)
+        query = dict(portal_type="AnalysisSpec", title=specs_title)
+        specs = api.search(query, 'bika_setup_catalog')
+        if specs:
+            obj.setSpecification(api.get_object(specs[0]))
 
     elif ISample.providedBy(obj):
         sample_events._cascade_transition(obj, 'no_sampling_workflow')
@@ -73,3 +87,115 @@ def after_deliver(obj):
 
     elif ISample.providedBy(obj):
         sample_events._cascade_transition(obj, 'deliver')
+
+
+def after_receive(obj):
+    """Event fired after receive (Process) transition is triggered
+    """
+    logger.info("*** Custom after_receive transition ***")
+
+    if IAnalysisRequest.providedBy(obj):
+
+        # Transition Analyses to sample_due
+        ans = obj.getAnalyses(full_objects=True, cancellation_state='active')
+        for analysis in ans:
+            doActionFor(analysis, 'receive')
+
+        # Promote to sample
+        sample = obj.getSample()
+        if sample:
+            doActionFor(sample, 'receive')
+
+        # Generate a derived AR (and Sample) for every single partition and
+        create_requests_from_partitions(obj)
+
+    elif ISample.providedBy(obj):
+        sample_events._cascade_transition(obj, 'receive')
+
+
+def create_requests_from_partitions(analysis_request):
+    """If more than one SamplePartition is set for the given AnalysisRequest,
+    creates a new internal AR for every single SamplePartition, assign the
+    primary sample to children and removes the analyses from the primary AR.
+    """
+    logger.info("*** Creating new requests from partitions ***")
+    partitions = analysis_request.getPartitions()
+    if len(partitions) < 2:
+        # Only one partition, do not create new requests
+        return list()
+
+    created = list()
+    client = analysis_request.getClient()
+    primary_sample = analysis_request.getSample()
+    primary_sample_uid = api.get_uid(primary_sample)
+
+    ar_proxies = analysis_request.Schema().fields()
+    ar_proxies = filter(lambda field: IProxyField.providedBy(field), ar_proxies)
+    ar_proxies = map(lambda field: field.getName(), ar_proxies)
+    skip_fields = ["Client", "Sample", "PrimarySample", "Template", "Profile",
+                   "Profiles", "Analyses", "RejectionReasons", "Remarks"]
+    skip_fields.extend(ar_proxies)
+    for part in partitions:
+        analyses = part.getAnalyses()
+        analyses = map(lambda an: api.get_object(an), analyses)
+
+        # Create the new derivative sample (~partition)
+        field_values = dict(PrimarySample=primary_sample_uid, InternalUse=True)
+        sample_copy = copy(primary_sample, container=client,
+                           new_field_values=field_values)
+        #sample_copy.id = part.id
+        sample_uid = api.get_uid(sample_copy)
+
+        # Create a new Analysis Request for this Sample and analyses
+        field_values = dict(Sample=sample_uid, Analyses=analyses)
+        ar_copy = copy(analysis_request, container=client,
+                       skip_fields=skip_fields, new_field_values=field_values)
+
+        # Create sample partition
+        services = map(lambda an: an.getAnalysisService(), analyses)
+        partition = dict(services=services,
+                         part_id="{}-P1".format(sample_copy.getId()))
+        create_samplepartition(sample_copy, partition, analyses)
+
+        # Force all items to be in received state
+        force_receive(ar_copy)
+
+        created.append(ar_copy)
+    return created
+
+
+def force_receive(analysis_request):
+    doActionFor(analysis_request, "no_sampling_workflow")
+    doActionFor(analysis_request, "send_to_lab")
+    doActionFor(analysis_request, "deliver")
+    doActionFor(analysis_request, "receive")
+
+
+def copy(source, container, skip_fields=None, new_field_values=None):
+    if new_field_values is None:
+        new_field_values = dict()
+    source = api.get_object(source)
+    logger.info("Creating copy of {} with id {}".format(source.portal_type, source.id))
+    destination = _createObjectByType(source.portal_type, container, tmpID())
+    field_values = to_dict(source, skip_fields=skip_fields)
+    for field_name, field_value in field_values.items():
+        _api.set_field_value(destination, field_name, field_value)
+    for field_name, field_value in new_field_values.items():
+        _api.set_field_value(destination, field_name, field_value)
+    destination.unmarkCreationFlag()
+    renameAfterCreation(destination)
+    destination.reindexObject()
+    return destination
+
+def to_dict(brain_or_object, skip_fields=None):
+    if skip_fields is None:
+        skip_fields = list()
+    brain_or_object = api.get_object(brain_or_object)
+    out = {}
+    fields = brain_or_object.Schema().fields()
+    for field in fields:
+        fieldname = field.getName()
+        if fieldname not in skip_fields:
+            value = _api.get_field_value(brain_or_object, fieldname)
+            out[fieldname] = value
+    return out

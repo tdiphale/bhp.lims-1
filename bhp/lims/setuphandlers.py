@@ -8,8 +8,10 @@ from Products.CMFCore.permissions import ModifyPortalContent, View, \
     AccessContentsInformation
 from Products.CMFPlone.utils import _createObjectByType
 from Products.DCWorkflow.Guard import Guard
+from bhp.lims import api as _api
 from bhp.lims import bhpMessageFactory as _
 from bhp.lims import logger
+from bhp.lims.specscalculations import get_xls_specifications
 from bika.lims import api
 from bika.lims.catalog.analysisrequest_catalog import \
     CATALOG_ANALYSIS_REQUEST_LISTING
@@ -52,12 +54,17 @@ def setupHandler(context):
     # Setup Attachment Types (requisition + delivery)
     setup_attachment_types(portal)
 
-    # TODO move to upgradesteps
     # Update priorities to Urgent, Routine, STAT
     update_priorities(portal)
 
     # update analysis services (Replace % by PCT in Analysis Keywords)
     update_services(portal)
+
+    # Update InternalUse for Samples and Analysis Requests
+    update_internal_use(portal)
+
+    # Import specifications from bhp/lims/resources/results_ranges.xlsx
+    import_specifications(portal)
 
     logger.info("BHP setup handler [DONE]")
 
@@ -137,9 +144,9 @@ def hide_unused_ar_fields(portal):
                            "ClientOrderNumber", "ClientReference",
                            "Composite", "Contact", "DefaultContainerType",
                            "EnvironmentalConditions", "InvoiceExclude",
-                           "PreparationWorkflow", "Sample", "Profiles",
-                           "SampleCondition", "SamplePoint", "Sampler",
-                           "SamplingDate", "SamplingDeviation", "SamplingRound",
+                           "Sample", "Profiles", "SampleCondition",
+                           "SamplePoint", "Sampler", "SamplingDate",
+                           "SamplingDeviation", "SamplingRound",
                            "Specification", "StorageLocation", "SubGroup",]
 
     bika_setup = portal.bika_setup
@@ -167,7 +174,7 @@ def sort_ar_fields(portal):
             'StorageLocation', 'ClientOrderNumber', 'ClientReference',
             'SamplingDeviation', 'SampleCondition', 'Priority',
             'EnvironmentalConditions', 'DefaultContainerType', 'AdHoc',
-            'Composite', 'InvoiceExclude', 'PreparationWorkflow']
+            'Composite', 'InvoiceExclude',]
 
     bika_setup = portal.bika_setup
     annotation = IAnnotations(bika_setup)
@@ -297,10 +304,9 @@ def setup_shipment_workflow_for(portal, workflow_id):
     # Change the title "Sample Due" to "Sample Delivered"
     workflow.states.sample_due.title = "At reception"
     # Change the title "Sample received" to "At point of testing"
-    workflow.transitions.receive.title="Receive at point of testing"
-    workflow.transitions.receive.actbox_name = "Receive at point of testing"
+    workflow.transitions.receive.title="Process"
+    workflow.transitions.receive.actbox_name = "Process"
     workflow.states.sample_received.title = "At point of testing"
-
 
 
 def update_role_mappings(obj_or_brain, wfs=None, reindex=True):
@@ -402,3 +408,112 @@ def setup_attachment_types(portal):
                     attachment.setAttachmentType(val)
                     attachment.setReportOption('i') # Ignore in report
                     break
+
+
+def import_specifications(portal):
+    """Creates (or updates) dynamic specifications from
+    resources/results_ranges.xlsx
+    """
+
+    logger.info("*** Importing specifications ***")
+
+    def get_bs_object(xlsx_row, xlsx_keyword, portal_type, criteria):
+        text_value = xlsx_row.get(xlsx_keyword, None)
+        if not text_value:
+            logger.warn("Value not set for keyword {}".format(xlsx_keyword))
+            return None
+
+        query = {"portal_type": portal_type, criteria: text_value}
+        brain = api.search(query, 'bika_setup_catalog')
+        if not brain:
+            logger.warn("No objects found for type {} and {} '{}'"
+                        .format(portal_type, criteria, text_value))
+            return None
+        if len(brain) > 1:
+            logger.warn("More than one object found for type {} and {} '{}'"
+                        .format(portal_type, criteria, text_value))
+            return None
+
+        return api.get_object(brain[0])
+
+    raw_specifications = get_xls_specifications()
+    for spec in raw_specifications:
+
+        # Valid Sample Type?
+        sample_type = get_bs_object(spec, "sample_type", "SampleType", "title")
+        if not sample_type:
+            continue
+
+        # Valid Analysis Service?
+        service = get_bs_object(spec, "keyword", "AnalysisService", "getKeyword")
+        if not service:
+            continue
+
+        # The calculation exists?
+        calc_title = "Ranges calculation"
+        query = dict(calculation=calc_title)
+        calc = get_bs_object(query, "calculation", "Calculation", "title")
+        if not calc:
+            # Create a new one
+            folder = portal.bika_setup.bika_calculations
+            _id = folder.invokeFactory("Calculation", id=tmpID())
+            calc = folder[_id]
+            calc.edit(title=calc_title,
+                      PythonImports=[{"module": "bhp.lims.specscalculations",
+                                      "function": "get_specification_for"}],
+                      Formula="get_specification_for($spec)")
+            calc.unmarkCreationFlag()
+            renameAfterCreation(calc)
+
+        # Existing AnalysisSpec?
+        specs_title = "{} - calculated".format(sample_type.Title())
+        query = dict(portal_type='AnalysisSpec', title=specs_title)
+        aspec = api.search(query, 'bika_setup_catalog')
+        if not aspec:
+             # Create the new AnalysisSpecs object!
+             folder = portal.bika_setup.bika_analysisspecs
+             _id = folder.invokeFactory('AnalysisSpec', id=tmpID())
+             aspec = folder[_id]
+             aspec.edit(title=specs_title)
+             aspec.unmarkCreationFlag()
+             renameAfterCreation(aspec)
+        elif len(aspec) > 1:
+            logger.warn("More than one Analysis Specification found for {}"
+                        .format(specs_title))
+            continue
+        else:
+            aspec = api.get_object(aspec[0])
+        aspec.setSampleType(sample_type)
+
+        # Set the analysis keyword and bind it to the calculation to use
+        keyword = service.getKeyword()
+        specs_dict = {
+            'keyword': keyword,
+            'min_operator': 'geq',
+            'min': '0',
+            'max_operator': 'lt',
+            'max': '0',
+            'minpanic': '',
+            'maxpanic': '',
+            'warn_min': '',
+            'warn_max': '',
+            'hidemin': '',
+            'hidemax': '',
+            'rangecomments': '',
+            'calculation': api.get_uid(calc),
+        }
+        ranges = _api.get_field_value(aspec, 'ResultsRange', [{}])
+        ranges = filter(lambda val: val.get('keyword') != keyword, ranges)
+        ranges.append(specs_dict)
+        aspec.setResultsRange(ranges)
+
+
+def update_internal_use(portal):
+    """Walks through all Samples and assigns its value to False if no value set
+    """
+    logger.info("*** Updating InternalUse field on Samples/ARs ***")
+    samples = api.search(dict(portal_type="Sample"), "bika_catalog")
+    for sample in samples:
+        sample = api.get_object(sample)
+        if _api.get_field_value(sample, "InternalUse", None) is None:
+            _api.set_field_value(sample, "InternalUse", False)

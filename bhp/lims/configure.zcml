@@ -5,7 +5,6 @@
     xmlns:cmf="http://namespaces.zope.org/cmf"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     xmlns:zcml="http://namespaces.zope.org/zcml"
-    xmlns:monkey="http://namespaces.plone.org/monkey"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="bhp">
 
@@ -26,6 +25,7 @@
   <include package=".content"/>
   <include package=".browser"/>
   <include package=".setupdata"/>
+  <include package=".monkeys"/>
 
   <!-- Routes to additional resources (e.g. css, js, etc.) -->
   <browser:resourceDirectory

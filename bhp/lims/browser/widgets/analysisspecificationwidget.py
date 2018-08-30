@@ -5,6 +5,7 @@
 from AccessControl import ClassSecurityInfo
 from Products.Archetypes.Registry import registerWidget
 from bhp.lims.browser.analysisspecification import AnalysisSpecificationView
+from bika.lims import api
 from bika.lims.browser.widgets.analysisspecificationwidget import \
     AnalysisSpecificationWidget as BaseWidget
 
@@ -33,8 +34,12 @@ class AnalysisSpecificationWidget(BaseWidget):
             item = values[index]
             min_panic = self._get_spec_value(form, item["uid"], "minpanic")
             max_panic = self._get_spec_value(form, item["uid"], "maxpanic")
+            s_calc = self._get_spec_value(form, item["uid"], "calculation",
+                                                     check_floatable=False)
+
             values[index]["minpanic"] = min_panic
             values[index]["maxpanic"] = max_panic
+            values[index]["calculation"] = s_calc
 
         return values, outdict
 

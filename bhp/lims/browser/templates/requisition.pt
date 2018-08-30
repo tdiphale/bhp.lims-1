@@ -194,10 +194,9 @@
           </div>
           <div class="field-line">
             <div class="field">
-              <div class="label">Sample Type / Volume</div>
+              <div class="label">Container Type</div>
               <div class="value">
                 <span tal:content="python: sample.getSampleType().Title()"></span>&nbsp;/&nbsp;
-                <span tal:content="python: view.get(sample, 'Volume')"></span>
               </div>
             </div>
             <div class="clearfix"></div>

@@ -6,38 +6,6 @@
   <configure package="Products.CMFPlone.browser">
       <include package="z3c.unconfigure" file="meta.zcml" />
       <unconfigure>
-          <!-- Main Analysis Requests View -->
-          <browser:page
-              for="bika.lims.interfaces.IAnalysisRequestsFolder"
-              name="base_view"
-              class="bika.lims.browser.analysisrequest.analysisrequests.AnalysisRequestsView"
-              permission="bika.lims.ManageAnalysisRequests"
-              layer="bika.lims.interfaces.IBikaLIMS"
-          />
-          <!-- Client Analysis Requests View -->
-          <browser:page
-              for="bika.lims.interfaces.IClient"
-              name="base_view"
-              class="bika.lims.browser.client.ClientAnalysisRequestsView"
-              permission="zope2.View"
-              layer="bika.lims.interfaces.IBikaLIMS"
-          />
-          <!-- Main Analysis Specs view -->
-          <browser:page
-              for="bika.lims.interfaces.IAnalysisSpecs"
-              name="folder_view"
-              class="bika.lims.controlpanel.bika_analysisspecs.AnalysisSpecsView"
-              permission="bika.lims.ManageBika"
-              layer="bika.lims.interfaces.IBikaLIMS"
-          />
-          <!-- Client Analysis Specs View -->
-          <browser:page
-              for="bika.lims.interfaces.IClient"
-              name="analysisspecs"
-              class="bika.lims.browser.client.ClientAnalysisSpecsView"
-              permission="zope2.View"
-              layer="bika.lims.interfaces.IBikaLIMS"
-          />
           <!-- Workflow action button clicked inside Analysis Request -->
           <browser:page
               for="bika.lims.interfaces.IAnalysisRequest"
@@ -125,38 +93,6 @@
           />
       </unconfigure>
 
-      <!-- Main Analysis Requests View -->
-      <browser:page
-          for="bika.lims.interfaces.IAnalysisRequestsFolder"
-          name="base_view"
-          class="bhp.lims.browser.analysisrequests.AnalysisRequestsView"
-          permission="bika.lims.ManageAnalysisRequests"
-          layer="bika.lims.interfaces.IBikaLIMS"
-      />
-      <!-- Client Analysis Requests View -->
-      <browser:page
-          for="bika.lims.interfaces.IClient"
-          name="base_view"
-          class="bhp.lims.browser.analysisrequests.ClientAnalysisRequestsView"
-          permission="zope2.View"
-          layer="bika.lims.interfaces.IBikaLIMS"
-      />
-      <!-- Main Analysis Specs view -->
-      <browser:page
-          for="bika.lims.interfaces.IAnalysisSpecs"
-          name="folder_view"
-          class="bhp.lims.browser.analysisspecsfolder.AnalysisSpecsFolderContentsView"
-          permission="bika.lims.ManageBika"
-          layer="bika.lims.interfaces.IBikaLIMS"
-      />
-      <!-- Client Analysis Specs View -->
-      <browser:page
-          for="bika.lims.interfaces.IClient"
-          name="analysisspecs"
-          class="bhp.lims.browser.analysisspecsfolder.ClientAnalysisSpecsFolderContentsView"
-          permission="zope2.View"
-          layer="bika.lims.interfaces.IBikaLIMS"
-      />
       <!-- Workflow action button clicked inside Analysis Request -->
       <browser:page
           for="bika.lims.interfaces.IAnalysisRequest"

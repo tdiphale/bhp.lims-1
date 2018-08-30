@@ -198,8 +198,7 @@
       </tr>
       <tal:ar repeat="analysisrequest view/analysis_requests">
       <tr tal:define="sample python: analysisrequest.getSample();
-                      client python:analysisrequest.aq_parent">
-          <td>
+                      client python:analysisrequest.aq_parent"><td>
             <div>
                 <input type="checkbox">
                 <span tal:content="python: analysisrequest.id"></span>
