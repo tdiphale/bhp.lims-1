@@ -18,6 +18,20 @@ class AnalysisRequestsView(BaseView):
         super(AnalysisRequestsView, self).__init__(context, request)
         init_listing(self)
 
+        # custom barcode transition
+        generate_barcodes = {
+            "id": "generate_barcodes",
+            "title": _("Barcodes"),
+            "url": "generate_barcodes"
+        }
+
+        for rs in self.review_states:
+            if rs.get("custom_transitions") is None:
+                rs["custom_transitions"] = []
+            transitions = rs["custom_transitions"]
+            transitions.append(generate_barcodes)
+            rs["custom_transitions"] = transitions
+
     def folderitem(self, obj, item, index):
         item = BaseView.folderitem(self, obj, item, index)
         return folder_listing_item(self, obj, item, index)

@@ -2,6 +2,8 @@
 #
 # Copyright 2018 Botswana Harvard Partnership (BHP)
 
+import os
+
 from Products.validation import validation
 from Products.validation.interfaces.IValidator import IValidator
 from bhp.lims import logger
@@ -12,6 +14,21 @@ from bika.lims.validators import \
     AnalysisSpecificationsValidator as BaseValidator
 from bika.lims.validators import get_record_value
 from zope.interface import implements
+
+
+class OSPathValidator(object):
+    """Validates
+    """
+    implements(IValidator)
+    name = "os_path_exists"
+
+    def __call__(self, value, *args, **kwargs):
+        if not os.path.exists(value):
+            return _("Path not found")
+        return True
+
+
+validation.register(OSPathValidator())
 
 
 class AnalysisSpecificationsValidator(BaseValidator):

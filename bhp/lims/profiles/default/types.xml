@@ -3,4 +3,7 @@
  <property name="title">Controls the available content types in your portal</property>
  <object name="Courier" meta_type="Factory-based Type Information with dynamic views"/>
  <object name="Couriers" meta_type="Factory-based Type Information with dynamic views"/>
+ <!-- Barcode Printer -->
+ <object name="BarcodePrinters" meta_type="Factory-based Type Information with dynamic views"/>
+ <object name="BarcodePrinter" meta_type="Factory-based Type Information with dynamic views"/>
 </object>

@@ -79,4 +79,20 @@
       layer="bhp.lims.interfaces.IBhpLIMS"
   />
 
+  <!-- AR Barcode View -->
+  <browser:page
+      for="*"
+      name="generate_barcodes"
+      class=".generate_barcodes.GenerateBarcodesView"
+      permission="bika.lims.ManageAnalysisRequests"
+      layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
+  <!-- Register static directory for JS/CSS/Image resources -->
+  <browser:resourceDirectory
+      name="bhp.lims.static"
+      directory="static"
+      layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
 </configure>

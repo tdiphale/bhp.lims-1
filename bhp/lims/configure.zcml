@@ -26,6 +26,7 @@
   <include package=".browser"/>
   <include package=".setupdata"/>
   <include package=".monkeys"/>
+  <include package=".controlpanel"/>
 
   <!-- Routes to additional resources (e.g. css, js, etc.) -->
   <browser:resourceDirectory

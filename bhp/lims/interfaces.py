@@ -23,3 +23,13 @@ class ICourier(Interface):
 
 class ICouriers(Interface):
     """Folder containing all Couriers"""
+
+
+class IBarcodePrinters(Interface):
+    """Marker interface for the Barcode Printers
+    """
+
+
+class IBarcodePrinter(Interface):
+    """Marker interface for a Barcode Printer
+    """
