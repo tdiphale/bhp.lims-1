@@ -69,7 +69,7 @@ class GenerateBarcodesView(BrowserView):
         """
         return re.findall("\$\{(.*?)\}", template)
 
-    def format_template_for(self, obj, template, **kw):
+    def format_template_for(self, obj, template, default="", **kw):
         """Format the template for the given object
         """
         # convert the object into a SuperModel
@@ -78,13 +78,24 @@ class GenerateBarcodesView(BrowserView):
         keys = self.parse_placeholders(template)
 
         # N.B. We can not use string.Template, because it is not capable to
-        #      interpolate dotted keys, e.g. ${Client.ClientID}
+        #      interpolate dotted keys, e.g. ${DateSampled|to_date}
         for key in keys:
-            value = data.get(key)
-            template = template.replace("${%s}" % key, value)
+            value = default
+            # Split the value into Key|Converter
+            splitted = key.split("|")
+            if len(splitted) == 2:
+                # the key is the first part
+                k = splitted[0]
+                value = kw.get(k) or model.get(k)
+                converter = getattr(self, splitted[1], None)
+                if callable(converter):
+                    value = converter(value)
+            else:
+                value = kw.get(key) or model.get(key)
 
-        # allow key override by keywords
-        data.update(kw)
+            # Always ensure a string value
+            value = self.to_string(value)
+            template = template.replace("${%s}" % key, value)
 
         return template
 
@@ -110,13 +121,25 @@ class GenerateBarcodesView(BrowserView):
         return v
 
     def to_string(self, value):
-        """Convert a vaue to a CSV compatible string
+        """Convert a value to a string
         """
         if isinstance(value, unicode):
             value = value.encode("utf-8")
         if value is None:
             value = ""
         return str(value)
+
+    def to_date(self, value, fmt="%d/%m/%Y"):
+        """Convert a value to a datestring
+        """
+        if isinstance(value, DateTime):
+            return value.strftime(fmt)
+        return value
+
+    def to_long_date(self, value, fmt="%d/%m/%Y %H:%M"):
+        """Convert a value to a datestring
+        """
+        return self.to_date(value, fmt=fmt)
 
     def get_objects(self):
         """Returns a list of objects coming from the "uids" request parameter
