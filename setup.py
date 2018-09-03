@@ -27,7 +27,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        "archetypes.schemaextender==2.1.8",
+        "archetypes.schemaextender",
         "pyBarcode",
         "senaite.core.supermodel>=1.0.0",
         "senaite.core>=1.2.8",
