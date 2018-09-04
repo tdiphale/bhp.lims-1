@@ -46,6 +46,23 @@ CATALOGS_BY_TYPE = [
     ("BarcodePrinter", ["bika_setup_catalog"]),
 ]
 
+PRINTERS = {
+    "Zebra Printer Template 1": {
+        "FileName": "lims-${id}.zpl",
+        "PrinterPath": "/tmp/",
+        "Template":
+        """^XA^PR4
+^FO315,15^A0N,20,15^FD${ClientID} ${TaxNumber} ${SampleType.Prefix}^FS
+^FO315,34^BY1^BCN,50,N,N,N,A
+^FD${id}^FS
+^FO315,92^A0N,20,15^FD${id} ${Template.title}^FS
+^FO315,112^A0N,20,15^FD${ParticipantID} ${ParticipantInitials}^FS
+^FO315,132^A0N,20,15^FDDOB: ${DateOfBirth|to_date} ${Gender}^FS
+^FO315,152^A0N,20,15^FD${DateSampled|to_long_date}^FS
+^XZ"""
+        },
+    }
+
 
 def setupHandler(context):
     """BHP setup handler
@@ -94,10 +111,41 @@ def setupHandler(context):
     # Setup Controlpanels
     setup_controlpanels(portal)
 
+    # Setup printer stickers
+    setup_printer_stickers(portal)
+
     # Setup Catalogs
     setup_catalogs(portal)
 
     logger.info("BHP setup handler [DONE]")
+
+
+def setup_printer_stickers(portal):
+    """Setup printers and stickers templates
+    """
+    logger.info("*** Setup printers and stickers ***")
+    def create_printer(printer_name, portal, defaults):
+        query = dict(portal_type="BarcodePrinter", Title=printer_name)
+        printers = api.search(query, "bika_setup_catalog")
+        if printers:
+            printer = api.get_object(printers[0])
+            printer.FileName = printer_values["FileName"]
+            printer.PrinterPath = printer_values["PrinterPath"]
+            printer.Template = printer_values["Template"]
+            return printer
+
+        # Create a new Barcode Printer
+        folder = portal.bika_setup.barcodeprinters
+        obj = _createObjectByType("BarcodePrinter", folder, tmpID())
+        obj.edit(title=printer_name,
+                 FileName=printer_values["FileName"],
+                 PrinterPath=printer_values["PrinterPath"],
+                 Template=printer_values["Template"])
+        obj.unmarkCreationFlag()
+        renameAfterCreation(obj)
+
+    for printer_name, printer_values in PRINTERS.items():
+        create_printer(printer_name, portal, printer_values)
 
 
 def setup_laboratory(portal):

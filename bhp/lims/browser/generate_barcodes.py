@@ -2,6 +2,8 @@
 
 import os
 import re
+import subprocess
+import os
 from collections import OrderedDict
 
 from bhp.lims import bhpMessageFactory as _
@@ -48,6 +50,7 @@ class GenerateBarcodesView(BrowserView):
                 # format the filename template
                 filename = self.format_template_for(obj, printer.getFileName())
                 self.write(barcode, filename, filepath)
+                self.send_to_printer(printer.Title(), filename, filepath)
 
             message = _("Barcode printed for {}".format(
                 ",".join(map(api.get_title, objs))))
@@ -91,13 +94,20 @@ class GenerateBarcodesView(BrowserView):
                 if callable(converter):
                     value = converter(value)
             else:
-                value = kw.get(key) or model.get(key)
+                value = kw.get(key) or self.get(model, key)
 
             # Always ensure a string value
             value = self.to_string(value)
             template = template.replace("${%s}" % key, value)
 
         return template
+
+    def send_to_printer(self, printer_name, file_name, file_path):
+        """Send the file to the printer
+        """
+        path = os.path.join(file_path, file_name)
+        command = ["lpr", "-P", printer_name, "-o", "raw", path]
+        subprocess.call(command)
 
     def write(self, contents, filename, filepath):
         """Writes the contents to the given path
@@ -109,16 +119,21 @@ class GenerateBarcodesView(BrowserView):
         return True
 
     def get(self, obj, key):
-        v = obj
-        for k in key.split("."):
+        if not obj or not key:
+            return ""
+        parts = key.split(".")
+        if len(parts) == 1:
+            v = obj.get(key)
             if v is None:
                 logger.warn("No reference found for key={} on object={}"
                             .format(key, obj.id))
                 return "*** {} is not a valid key ***".format(key)
-            v = v.get(k)
-        if callable(v):
-            v = v()
-        return v
+            if callable(v):
+                v = v()
+            return v
+        nkey = '.'.join(parts[1:])
+        nobj = obj.get(parts[0])
+        return self.get(nobj, nkey)
 
     def to_string(self, value):
         """Convert a value to a string
@@ -146,6 +161,9 @@ class GenerateBarcodesView(BrowserView):
         """
         # Create a mapping of source ARs for copy
         uids = self.request.form.get("uids", [])
+        if not uids:
+            uids = self.request.form.get("items", [])
+            uids = uids.split(',')
         # handle 'uids' GET parameter coming from a redirect
         if isinstance(uids, basestring):
             uids = uids.split("; ")

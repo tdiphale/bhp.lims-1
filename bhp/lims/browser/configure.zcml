@@ -88,6 +88,14 @@
       layer="bhp.lims.interfaces.IBhpLIMS"
   />
 
+  <browser:page
+      for="*"
+      name="sticker"
+      class=".generate_barcodes.GenerateBarcodesView"
+      permission="zope2.View"
+      layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
   <!-- Register static directory for JS/CSS/Image resources -->
   <browser:resourceDirectory
       name="bhp.lims.static"
