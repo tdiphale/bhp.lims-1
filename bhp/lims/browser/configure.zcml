@@ -9,16 +9,6 @@
       type="stickers"
       name="BHP Stickers"/>
 
-  <plone:static
-      directory="reports"
-      type="reports"
-      name="BHP Reports"/>
-
-    <!-- Report resource directory -->
-  <plone:static
-      directory="reports"
-      type="senaite.impress.reports" />
-
   <browser:page
       for="bika.lims.interfaces.IAnalysisRequest"
       name="requisition"

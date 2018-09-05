@@ -23,6 +23,15 @@
       provides="senaite.impress.interfaces.IMultiReportView"
       permission="zope2.View"/>
 
+  <!-- Email View -->
+  <browser:page
+      for="bika.lims.interfaces.IClient"
+      name="email"
+      class=".emailview.EmailView"
+      permission="bika.lims.ManageAnalysisRequests"
+      layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
   <!-- senaite.impress resource directory -->
   <plone:static
       directory="reports"
