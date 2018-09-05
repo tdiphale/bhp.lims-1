@@ -34,5 +34,4 @@ var
 *ide-plugin.xml
 /tags
 .mr.developer.cfg
-src/senaite.core
-src/senaite.lims
+src/senaite.*
