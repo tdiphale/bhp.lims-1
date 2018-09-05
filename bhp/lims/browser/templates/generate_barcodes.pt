@@ -97,11 +97,11 @@
                  i18n:attributes="value"
                  value="Print"/>
 
-          <input class="btn btn-danger btn-sm"
+          <input class="btn btn-default btn-sm"
                  type="submit"
-                 name="abort"
+                 name="cancel"
                  i18n:attributes="value"
-                 value="Abort"/>
+                 value="Cancel"/>
         </div>
 
       </form>

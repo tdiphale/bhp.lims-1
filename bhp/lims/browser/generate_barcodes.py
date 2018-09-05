@@ -30,7 +30,7 @@ class GenerateBarcodesView(BrowserView):
         form = self.request.form
         form_submitted = form.get("submitted", False)
         form_print = form.get("print", False)
-        form_abort = form.get("abort", False)
+        form_cancel = form.get("cancel", False)
         objs = self.get_objects()
 
         if not objs:
@@ -57,10 +57,10 @@ class GenerateBarcodesView(BrowserView):
             self.add_status_message(message, "info")
             return self.request.response.redirect(self.exit_url)
 
-        # Handle form abort
-        if form_submitted and form_abort:
-            logger.info("*** ABORT ***")
-            message = _("Barcode print aborted")
+        # Handle form cancel
+        if form_submitted and form_cancel:
+            logger.info("*** CANCEL ***")
+            message = _("Barcode print cancelled")
             self.add_status_message(message, "warn")
             return self.request.response.redirect(self.exit_url)
 
