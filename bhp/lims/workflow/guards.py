@@ -24,10 +24,6 @@ def guard_send_to_lab(context):
     if not api.is_active(sample):
         return False
 
-    # If sample does not have a courier assigned, we cannot deliver
-    if not sample.Schema()['Courier'].get(sample):
-        return False
-
     # Only users from role Client can send the sample to the lab
     user = api.get_current_user()
     user_roles = user.getRoles()

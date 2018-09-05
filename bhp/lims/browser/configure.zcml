@@ -96,6 +96,15 @@
       layer="bhp.lims.interfaces.IBhpLIMS"
   />
 
+  <!-- Corier Shipment View -->
+  <browser:page
+      for="*"
+      name="courier_shipment"
+      class=".courier_shipment.CourierShipmentView"
+      permission="zope2.View"
+      layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
   <!-- Register static directory for JS/CSS/Image resources -->
   <browser:resourceDirectory
       name="bhp.lims.static"
