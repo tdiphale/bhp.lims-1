@@ -24,12 +24,12 @@
       table.nopadding td { padding: 0; }
       table td.label { padding-right: 0.3rem; }
       table td.label { white-space: nowrap; }
+      .table td, .table th { border-top: none; border-bottom: 1px solid #dee2e6 }
 
 
       .middle-dot-after:after { content: " · "; }
       .iphen-after:after { content: " - "; }
       .table-sm { padding-top: 0; padding-bottom:0 }
-      font-weight: bold;
 
 
       @page {
@@ -370,8 +370,6 @@
                 <col style="width: 15%">
                 <!-- Range -->
                 <col style="width: 20%">
-                <!-- Out of Range -->
-                <col style="width: 5%">
                 <!-- Flags -->
                 <col style="width: 30%">
               </colgroup>
@@ -388,9 +386,6 @@
                   </th>
                   <th class="specs">
                     <span i18n:translate="">RR</span>
-                  </th>
-                  <th class="outofrange">
-                    <span i18n:translate=""></span>
                   </th>
                   <th class="flags">
                     <span i18n:translate="">Flags</span>
@@ -424,15 +419,6 @@
                             tal:content="structure python:model.get_formatted_uncertainty(analysis)"></span>
                       <span tal:content="python:'(RT)' if model.is_retested(analysis) else ''"></span>
                       <span tal:content="python:model.get_formatted_specs(analysis)">50 - 60</span>
-                    </td>
-                    <td class="text-center align-middle">
-                      <span tal:condition="python:model.is_out_of_range(analysis)"
-                            class="font-weight-light">
-                        <span class="outofrange text-danger"
-                              style="font-family:Lucida Console, Courier, monospace;"
-                              tal:content="outofrange_symbol">
-                        </span>
-                      </span>
                     </td>
                     <td class="text-center align-middle graphrange"
                         tal:define="rr analysis/getResultsRange;
@@ -503,19 +489,6 @@
                 </div>
               </td>
             </tal:manager>
-            <tal:reporter define="reporter python:view.current_user" condition="reporter">
-              <td style="border:none">
-                <div class="label" i18n:translate="">Published by</div>
-                <div>
-                  <span tal:content="reporter/fullname|reporter/username"></span>
-                  <tal:email tal:condition="reporter/email|nothing"
-                             tal:define="email reporter/email|nothing">
-                    (<a tal:content="email"
-                        tal:attributes="href string:mailto:${email}"></a>)
-                  </tal:email>
-                </div>
-              </td>
-            </tal:reporter>
           </tr>
         </table>
       </div>
@@ -523,32 +496,29 @@
   </tal:render>
 
   <!--  FOOTER -->
-  <tal:render condition="python:True">
+  <tal:render condition="python:False">
     <div class="row footer">
-  <div class='page-footer'>
-    <table>
-        <tr>
-            <td class="small" style="width:50%">
-                <div>
-                    * test accredited<br/>
-                    ** test not accredited<br/>
-                    *** test sub-contracted to an accredited laboratory<br/>
-                    **** test sub-contracted to a non accredited laboratory
-                <div>
-            </td>
-            <td class="green small" style="width:50%">
-                This report refers only to the samples tested.<br/>
-                The sample collection is the customer's responsability.<br/>
-                When applicable, this version completely replaces the previous version.<br/>
-                Prohibited the partial reproduction of this document.<br/>
-                The opinions and interpretation are outside of the accreditation scope.
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2">Page <span class="page-current-num"></span> of <span class="page-total-count"></span></td>
-        </tr>
-    </table>
-</div>
+      <div class="col-sm-12">
+        <table>
+            <tr>
+                <td class="small" style="width:50%">
+                    <div>
+                        * test accredited<br/>
+                        ** test not accredited<br/>
+                        *** test sub-contracted to an accredited laboratory<br/>
+                        **** test sub-contracted to a non accredited laboratory
+                    <div>
+                </td>
+                <td class="green small" style="width:50%">
+                    This report refers only to the samples tested.<br/>
+                    The sample collection is the customer's responsability.<br/>
+                    When applicable, this version completely replaces the previous version.<br/>
+                    Prohibited the partial reproduction of this document.<br/>
+                    The opinions and interpretation are outside of the accreditation scope.
+                </td>
+            </tr>
+        </table>
+    </div>
     </div>
   </tal:render>
 
