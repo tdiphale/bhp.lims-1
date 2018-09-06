@@ -44,6 +44,7 @@ COLUMNS = [
 CATALOGS_BY_TYPE = [
     # Tuples of (type, [catalog])
     ("BarcodePrinter", ["bika_setup_catalog"]),
+    ("Courier", ["bika_setup_catalog"]),
 ]
 
 PRINTERS = {
@@ -170,10 +171,6 @@ def setup_new_content_types(portal):
         obj = portal.bika_setup[obj_id]
         obj.unmarkCreationFlag()
         obj.reindexObject()
-
-    # Set catalogs by type
-    at = api.get_tool('archetype_tool')
-    at.setCatalogsByType('Courier', ['portal_catalog', ])
 
 
 def setup_id_formatting(portal):
@@ -692,9 +689,22 @@ def setup_catalogs(portal):
     # Setup catalogs by type
     for type_name, catalogs in CATALOGS_BY_TYPE:
         at = api.get_tool("archetype_tool")
-        at.setCatalogsByType(type_name, catalogs)
-        logger.info("*** Assign '%s' type to Catalogs %s" %
-                    (type_name, catalogs))
+        # get the current registered catalogs
+        current_catalogs = at.getCatalogsByType(type_name)
+        # get the desired catalogs this type should be in
+        desired_catalogs = map(api.get_tool, catalogs)
+        # check if the catalogs changed for this portal_type
+        if set(current_catalogs).difference(desired_catalogs):
+            # fetch the brains to reindex
+            brains = api.search({"portal_type": type_name})
+            # updated the catalogs
+            at.setCatalogsByType(type_name, catalogs)
+            logger.info("*** Assign '%s' type to Catalogs %s" %
+                        (type_name, catalogs))
+            for brain in brains:
+                obj = api.get_object(brain)
+                logger.info("*** Reindexing '%s'" % repr(obj))
+                obj.reindexObject()
 
     # Setup catalog indexes
     to_index = []
