@@ -2,7 +2,7 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="here/main_template/macros/master"
-      i18n:domain="senaite.core">
+      i18n:domain="bhp">
   <head>
     <metal:block fill-slot="javascript_head_slot"
                  tal:define="portal context/@@plone_portal_state/portal;">
@@ -22,7 +22,7 @@
 
     <metal:description fill-slot="content-description">
       <p i18n:translate="">
-        <a tal:attributes="href view/exit_url"
+        <a tal:attributes="href view/back_url"
            i18n:name="back_link"
            i18n:translate="">
           &larr; Back
@@ -90,13 +90,15 @@
           </table>
         </div>
 
+        <!-- Form Controls -->
         <div>
+          <!-- Print -->
           <input class="btn btn-success btn-sm"
                  type="submit"
                  name="print"
                  i18n:attributes="value"
                  value="Print"/>
-
+          <!-- Cancel -->
           <input class="btn btn-default btn-sm"
                  type="submit"
                  name="cancel"

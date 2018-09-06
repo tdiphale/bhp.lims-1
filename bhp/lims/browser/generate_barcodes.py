@@ -3,7 +3,6 @@
 import os
 import re
 import subprocess
-import os
 from collections import OrderedDict
 
 from bhp.lims import bhpMessageFactory as _
@@ -24,7 +23,7 @@ class GenerateBarcodesView(BrowserView):
         super(GenerateBarcodesView, self).__init__(context, request)
         self.context = context
         self.request = request
-        self.exit_url = self.context.absolute_url()
+        self.back_url = self.context.absolute_url()
 
     def __call__(self):
         form = self.request.form
@@ -33,39 +32,77 @@ class GenerateBarcodesView(BrowserView):
         form_cancel = form.get("cancel", False)
         objs = self.get_objects()
 
+        # No ARs selected
         if not objs:
-            self.add_status_message(_("No items selected for printing"))
-            referer = self.request.getHeader("referer")
-            return self.request.response.redirect(referer)
+            return self.redirect(message=_("No items selected"),
+                                 level="warning")
 
         # Handle form submit
         if form_submitted and form_print:
             logger.info("*** PRINT ***")
             printer_uid = form.get("barcode_printer", "")
             printer = self.get_object_by_uid(printer_uid)
+
+            # No printer selected/available
+            if not printer:
+                return self.redirect(message=_("No printer selected"),
+                                     level="warning")
+
+            # Proceed with selected printer
+            printer_name = printer.Title()
             filepath = printer.getPrinterPath()
+
+            # remember succeeded and failed printings
+            obj_succeed = []
+            obj_failed = []
+
             for obj in objs:
+                logger.info("*** SENDING {} TO THE PRINTER ***"
+                            .format(obj.getId()))
                 # format the barcode template
                 barcode = self.format_template_for(obj, printer.getTemplate())
                 # format the filename template
                 filename = self.format_template_for(obj, printer.getFileName())
                 self.write(barcode, filename, filepath)
-                self.send_to_printer(printer.Title(), filename, filepath)
+                success = self.send_to_printer(
+                    printer_name, filename, filepath)
+                if success:
+                    obj_succeed.append(obj)
+                else:
+                    obj_failed.append(obj)
 
-            message = _("Barcode printed for {}".format(
-                ",".join(map(api.get_title, objs))))
-            self.add_status_message(message, "info")
-            return self.request.response.redirect(self.exit_url)
+            # process a message for successful printings
+            if obj_succeed:
+                message = _("Barcodes sent to printer {} for {}"
+                            .format(printer_name,
+                                    "; ".join(map(api.get_title, objs))))
+                self.add_status_message(message, level="info")
+
+            # process a message for failed printings
+            if obj_failed:
+                message = _("Barcodes failed for printer {} for {}"
+                            .format(printer_name,
+                                    "; ".join(map(api.get_title, objs))))
+                self.add_status_message(message, level="error")
+
+            return self.redirect()
 
         # Handle form cancel
         if form_submitted and form_cancel:
             logger.info("*** CANCEL ***")
-            message = _("Barcode print cancelled")
-            self.add_status_message(message, "warn")
-            return self.request.response.redirect(self.exit_url)
+            self.redirect(message=_("Barcode print cancelled"), level="info")
 
         # render the template
         return self.template()
+
+    def redirect(self, redirect_url=None, message=None, level="info"):
+        """Redirect with a message
+        """
+        if redirect_url is None:
+            redirect_url = self.back_url
+        if message is not None:
+            self.add_status_message(message, level)
+        return self.request.response.redirect(redirect_url)
 
     def parse_placeholders(self, template):
         """Parse ${...} placeholders to a list of keys
@@ -107,7 +144,9 @@ class GenerateBarcodesView(BrowserView):
         """
         path = os.path.join(file_path, file_name)
         command = ["lpr", "-P", printer_name, "-o", "raw", path]
-        subprocess.call(command)
+        if subprocess.call(command) != 0:
+            return False
+        return True
 
     def write(self, contents, filename, filepath):
         """Writes the contents to the given path
@@ -160,15 +199,14 @@ class GenerateBarcodesView(BrowserView):
         """Returns a list of objects coming from the "uids" request parameter
         """
         # Create a mapping of source ARs for copy
-        uids = self.request.form.get("uids", [])
+        uids = self.request.form.get("uids", "")
         if not uids:
-            uids = self.request.form.get("items", [])
-            uids = uids.split(',')
-        # handle 'uids' GET parameter coming from a redirect
+            # check for the `items` parammeter
+            uids = self.request.form.get("items", "")
         if isinstance(uids, basestring):
-            uids = uids.split("; ")
+            uids = uids.split(",")
         unique_uids = OrderedDict().fromkeys(uids).keys()
-        return map(self.get_object_by_uid, unique_uids)
+        return filter(None, map(self.get_object_by_uid, unique_uids))
 
     @returns_super_model
     def to_super_model(self, obj_or_objs):
