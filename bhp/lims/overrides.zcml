@@ -78,6 +78,13 @@
               permission="bika.lims.ManageAnalysisRequests"
               layer="bika.lims.interfaces.IBikaLIMS"
           />
+          <browser:page
+              for="bika.lims.interfaces.IClient"
+              name="workflow_action"
+              class="bika.lims.browser.client.ClientWorkflowAction"
+              permission="zope.Public"
+              layer="bika.lims.interfaces.IBikaLIMS"
+          />
           <!-- After transitions handler -->
           <subscriber
               for="*
@@ -122,6 +129,14 @@
           for="bika.lims.interfaces.ISamplesFolder"
           name="workflow_action"
           class="bhp.lims.workflow.SamplesWorkflowAction"
+          permission="zope.Public"
+          layer="bika.lims.interfaces.IBikaLIMS"
+      />
+      <!-- Workflow action button clicked inside Client -->
+      <browser:page
+          for="bika.lims.interfaces.IClient"
+          name="workflow_action"
+          class="bhp.lims.workflow.AnalysisRequestsWorkflowAction"
           permission="zope.Public"
           layer="bika.lims.interfaces.IBikaLIMS"
       />
