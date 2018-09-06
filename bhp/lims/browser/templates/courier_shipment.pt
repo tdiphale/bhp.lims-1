@@ -1,0 +1,110 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="senaite.core">
+  <head>
+    <metal:block fill-slot="javascript_head_slot"
+                 tal:define="portal context/@@plone_portal_state/portal;">
+    </metal:block>
+
+    <metal:block fill-slot="style_slot"
+                 tal:define="portal context/@@plone_portal_state/portal;">
+    </metal:block>
+  </head>
+  <body>
+
+    <metal:title fill-slot="content-title">
+      <h1 i18n:translate="">
+        Send to Lab
+      </h1>
+    </metal:title>
+
+    <metal:description fill-slot="content-description">
+      <p i18n:translate="">
+        <a tal:attributes="href view/back_url"
+           i18n:name="back_link"
+           i18n:translate="">
+          &larr; Back
+        </a>
+      </p>
+    </metal:description>
+
+    <div id="courier-shipment"
+         class=""
+         metal:fill-slot="content-core"
+         tal:define="portal context/@@plone_portal_state/portal;">
+
+      <form class="form"
+            id="courier_shipment_form"
+            name="courier_shipment_form"
+            method="POST">
+
+        <div class="form-fields">
+          <input type="hidden" name="submitted" value="1"/>
+          <input tal:replace="structure context/@@authenticator/authenticator"/>
+
+          <div class="form-group">
+            <label i18n:translate="" for="couriers">
+              Couriers
+            </label>
+            <select name="courier" class="form-control">
+              <tal:options repeat="courier view/get_couriers_data">
+                <option tal:attributes="value courier/uid"
+                        tal:content="courier/title">
+                  Courier
+                </option>
+              </tal:options>
+            </select>
+          </div>
+
+          <table class="table">
+            <tr>
+              <th i18n:translate="">Analysis Request ID</th>
+              <th i18n:translate="">Client</th>
+              <th i18n:translate="">State</th>
+            </tr>
+            <tal:items repeat="ar view/get_ar_data">
+              <tr tal:attributes="class string:state-${ar/review_state}">
+                <td>
+                  <a href="#"
+                     tal:attributes="href ar/url">
+                    <span tal:content="ar/title"/>
+                    <input type="hidden" name="uids:list"
+                           tal:attributes="value ar/uid"/>
+                  </a>
+                </td>
+                <td tal:define="client ar/obj/getClient">
+                  <a href="#"
+                     tal:attributes="href client/absolute_url">
+                    <span tal:content="client/Name"/>
+                  </a>
+                </td>
+                <td>
+                  <span i18n:translate=""
+                        tal:content="ar/state_title"/>
+                </td>
+              </tr>
+            </tal:items>
+          </table>
+
+        </div>
+
+        <div>
+          <input class="btn btn-success btn-sm"
+                 type="submit"
+                 name="send"
+                 i18n:attributes="value"
+                 value="Send to Laboratory"/>
+
+          <input class="btn btn-secondary btn-sm"
+                 type="submit"
+                 name="cancel"
+                 i18n:attributes="value"
+                 value="Cancel"/>
+        </div>
+      </form>
+    </div>
+
+  </body>
+</html>

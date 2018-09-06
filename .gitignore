@@ -33,3 +33,5 @@ Thumbs.db
 var
 *ide-plugin.xml
 /tags
+.mr.developer.cfg
+src/senaite.*

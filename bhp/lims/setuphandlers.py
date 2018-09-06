@@ -23,6 +23,48 @@ from zope.annotation.interfaces import IAnnotations
 
 AR_CONFIGURATION_STORAGE = "bika.lims.browser.analysisrequest.manage.add"
 
+CONTROLPANELS = [
+    {
+        "id": "barcodeprinters",
+        "type": "BarcodePrinters",
+        "title": "Barcode Printers",
+        "description": "",
+        "insert-after": "*"
+    }
+]
+
+INDEXES = [
+    # Tuples of (catalog, id, indexed attribute, type)
+]
+
+COLUMNS = [
+    # Tuples of (catalog, column name)
+]
+
+CATALOGS_BY_TYPE = [
+    # Tuples of (type, [catalog])
+    ("BarcodePrinter", ["bika_setup_catalog"]),
+    ("Courier", ["bika_setup_catalog"]),
+]
+
+PRINTERS = {
+    "Zebra Printer Template 1": {
+        "FileName": "lims-${id}.zpl",
+        "PrinterPath": "/tmp/",
+        "Template":
+        """^XA^PR4
+^FO315,15^A0N,20,15^FD${ClientID} ${TaxNumber} ${SampleType.Prefix}^FS
+^FO315,34^BY1^BCN,50,N,N,N,A
+^FD${id}^FS
+^FO315,92^A0N,20,15^FD${id} ${Template.title}^FS
+^FO315,112^A0N,20,15^FD${ParticipantID} ${ParticipantInitials}^FS
+^FO315,132^A0N,20,15^FDDOB: ${DateOfBirth|to_date} ${Gender}^FS
+^FO315,152^A0N,20,15^FD${DateSampled|to_long_date}^FS
+^XZ"""
+        },
+    }
+
+
 def setupHandler(context):
     """BHP setup handler
     """
@@ -67,7 +109,44 @@ def setupHandler(context):
     # Import specifications from bhp/lims/resources/results_ranges.xlsx
     import_specifications(portal)
 
+    # Setup Controlpanels
+    setup_controlpanels(portal)
+
+    # Setup printer stickers
+    setup_printer_stickers(portal)
+
+    # Setup Catalogs
+    setup_catalogs(portal)
+
     logger.info("BHP setup handler [DONE]")
+
+
+def setup_printer_stickers(portal):
+    """Setup printers and stickers templates
+    """
+    logger.info("*** Setup printers and stickers ***")
+    def create_printer(printer_name, portal, defaults):
+        query = dict(portal_type="BarcodePrinter", Title=printer_name)
+        printers = api.search(query, "bika_setup_catalog")
+        if printers:
+            printer = api.get_object(printers[0])
+            printer.FileName = printer_values["FileName"]
+            printer.PrinterPath = printer_values["PrinterPath"]
+            printer.Template = printer_values["Template"]
+            return printer
+
+        # Create a new Barcode Printer
+        folder = portal.bika_setup.barcodeprinters
+        obj = _createObjectByType("BarcodePrinter", folder, tmpID())
+        obj.edit(title=printer_name,
+                 FileName=printer_values["FileName"],
+                 PrinterPath=printer_values["PrinterPath"],
+                 Template=printer_values["Template"])
+        obj.unmarkCreationFlag()
+        renameAfterCreation(obj)
+
+    for printer_name, printer_values in PRINTERS.items():
+        create_printer(printer_name, portal, printer_values)
 
 
 def setup_laboratory(portal):
@@ -92,10 +171,6 @@ def setup_new_content_types(portal):
         obj = portal.bika_setup[obj_id]
         obj.unmarkCreationFlag()
         obj.reindexObject()
-
-    # Set catalogs by type
-    at = api.get_tool('archetype_tool')
-    at.setCatalogsByType('Courier', ['portal_catalog', ])
 
 
 def setup_id_formatting(portal):
@@ -545,3 +620,123 @@ def update_internal_use(portal):
         sample = api.get_object(sample)
         if _api.get_field_value(sample, "InternalUse", None) is None:
             _api.set_field_value(sample, "InternalUse", False)
+
+
+def setup_controlpanels(portal):
+    """Setup Plone control and Senaite management panels
+    """
+    logger.info("*** Setup Controlpanels ***")
+
+    # get the bika_setup object
+    bika_setup = api.get_bika_setup()
+    cp = api.get_tool("portal_controlpanel")
+
+    def get_action_index(action_id):
+        if action_id == "*":
+            action = cp.listActions()[-1]
+            action_id = action.getId()
+        for n, action in enumerate(cp.listActions()):
+            if action.getId() == action_id:
+                return n
+        return -1
+
+    for item in CONTROLPANELS:
+        id = item.get("id")
+        type = item.get("type")
+        title = item.get("title")
+        description = item.get("description")
+
+        panel = bika_setup.get(id, None)
+        if panel is None:
+            logger.info("Creating Setup Folder '{}' in Setup.".format(id))
+            # allow content creation in setup temporary
+            portal_types = api.get_tool("portal_types")
+            fti = portal_types.getTypeInfo(bika_setup)
+            fti.filter_content_types = False
+            myfti = portal_types.getTypeInfo(type)
+            global_allow = myfti.global_allow
+            myfti.global_allow = True
+            _ = bika_setup.invokeFactory(type, id, title=title)
+            panel = bika_setup[_]
+            myfti.global_allow = global_allow
+            fti.filter_content_types = True
+        else:
+            # set some meta data
+            panel.setTitle(title)
+            panel.setDescription(description)
+
+        # Move configlet action to the right index
+        action_index = get_action_index(id)
+        ref_index = get_action_index(item["insert-after"])
+        if (action_index != -1) and (ref_index != -1):
+            actions = cp._cloneActions()
+            action = actions.pop(action_index)
+            actions.insert(ref_index + 1, action)
+            cp._actions = tuple(actions)
+            cp._p_changed = 1
+
+        # reindex the object to render it properly in the navigation portlet
+        panel.reindexObject()
+
+
+def setup_catalogs(portal):
+    """Setup Plone catalogs
+    """
+    logger.info("*** Setup Catalogs ***")
+
+    # Add InstrumentDomains to the right catalogs
+
+    # Setup catalogs by type
+    for type_name, catalogs in CATALOGS_BY_TYPE:
+        at = api.get_tool("archetype_tool")
+        # get the current registered catalogs
+        current_catalogs = at.getCatalogsByType(type_name)
+        # get the desired catalogs this type should be in
+        desired_catalogs = map(api.get_tool, catalogs)
+        # check if the catalogs changed for this portal_type
+        if set(current_catalogs).difference(desired_catalogs):
+            # fetch the brains to reindex
+            brains = api.search({"portal_type": type_name})
+            # updated the catalogs
+            at.setCatalogsByType(type_name, catalogs)
+            logger.info("*** Assign '%s' type to Catalogs %s" %
+                        (type_name, catalogs))
+            for brain in brains:
+                obj = api.get_object(brain)
+                logger.info("*** Reindexing '%s'" % repr(obj))
+                obj.reindexObject()
+
+    # Setup catalog indexes
+    to_index = []
+    for catalog, name, attribute, meta_type in INDEXES:
+        c = api.get_tool(catalog)
+        indexes = c.indexes()
+        if name in indexes:
+            logger.info("*** Index '%s' already in Catalog [SKIP]" % name)
+            continue
+
+        logger.info("*** Adding Index '%s' for field '%s' to catalog ..."
+                    % (meta_type, name))
+        c.addIndex(name, meta_type)
+        to_index.append((c, name))
+        logger.info("*** Added Index '%s' for field '%s' to catalog [DONE]"
+                    % (meta_type, name))
+
+    for catalog, name in to_index:
+        logger.info("*** Indexing new index '%s' ..." % name)
+        catalog.manage_reindexIndex(name)
+        logger.info("*** Indexing new index '%s' [DONE]" % name)
+
+    # Setup catalog metadata columns
+    for catalog, name in COLUMNS:
+        c = api.get_tool(catalog)
+        if name not in c.schema():
+            logger.info("*** Adding Column '%s' to catalog '%s' ..."
+                        % (name, catalog))
+            c.addColumn(name)
+            logger.info("*** Added Column '%s' to catalog '%s' [DONE]"
+                        % (name, catalog))
+        else:
+            logger.info("*** Column '%s' already in catalog '%s'  [SKIP]"
+                        % (name, catalog))
+            continue

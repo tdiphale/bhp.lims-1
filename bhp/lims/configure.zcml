@@ -26,6 +26,17 @@
   <include package=".browser"/>
   <include package=".setupdata"/>
   <include package=".monkeys"/>
+  <include package=".controlpanel"/>
+  <include package=".impress"/>
+
+  <!-- LIMS Export -->
+  <browser:page
+      for="*"
+      name="lims_export"
+      class=".export.ExportView"
+      permission="bika.lims.ManageAnalysisRequests"
+      layer="bhp.lims.interfaces.IBhpLIMS"
+      />
 
   <!-- Routes to additional resources (e.g. css, js, etc.) -->
   <browser:resourceDirectory

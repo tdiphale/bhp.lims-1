@@ -3,6 +3,7 @@
 # Copyright 2018 Botswana Harvard Partnership (BHP)
 
 from bhp.lims import logger
+from bhp.lims.api import get_field_value
 from bhp.lims.workflow import events
 from bhp.lims.workflow.guards import guard_send_to_lab
 from bika.lims import PMF
@@ -43,6 +44,12 @@ class SampleARWorkflowAction(BaseAnalysisRequestWorkflowAction):
         """
         logger.info("SampleARWorkflowAction.workflow_action_send_to_lab")
         action, came_from = self._get_form_workflow_action()
+        if not get_field_value(self.context, "Courier"):
+            message = "Cannot send to the lab. Courier is not set"
+            self.context.plone_utils.addPortalMessage(message, "error")
+            self.request.response.redirect(self.context.absolute_url())
+            return
+
         trans, dest = self.submitTransition(action, came_from, [self.context])
         if trans:
             message = PMF('Changes saved.')
@@ -93,8 +100,25 @@ class AnalysisRequestWorkflowAction(SampleARWorkflowAction):
 
 class SamplesWorkflowAction(ClientWorkflowAction):
     """ Workflow action button clicked in Samples folder list """
-    pass
+
+    def workflow_action_send_to_lab(self):
+        # Shipment delivery view for samples
+        uids = ','.join(self.request.form.get("uids", ""))
+        if not uids:
+            return
+        url = "{}{}".format(self.context.absolute_url(),
+                            '/courier_shipment?uids=' + uids)
+        self.request.response.redirect(url)
+
 
 class AnalysisRequestsWorkflowAction(ClientWorkflowAction):
     """ Workflow action button clicked in AR folder list """
-    pass
+
+    def workflow_action_send_to_lab(self):
+        # Shipment delivery view
+        uids = ','.join(self.request.form.get("uids", ""))
+        if not uids:
+            return
+        url = "{}{}".format(self.context.absolute_url(),
+                            '/courier_shipment?uids=' + uids)
+        self.request.response.redirect(url)

@@ -69,9 +69,6 @@ def after_send_to_lab(obj):
     elif ISample.providedBy(obj):
         sample_events._cascade_transition(obj, 'send_to_lab')
 
-        # Generate the delivery pdf
-        generate_delivery_pdf(obj)
-
 
 def after_deliver(obj):
     """ Event fired after delivery transition is triggered.

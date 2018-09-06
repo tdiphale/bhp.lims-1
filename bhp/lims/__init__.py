@@ -29,6 +29,9 @@ def initialize(context):
     from content.courier import Courier # noqa
     from content.couriers import Couriers # noqa
 
+    from bhp.lims.content.barcodeprinter import BarcodePrinter  # noqa
+    from bhp.lims.controlpanel.barcodeprinters import BarcodePrinters # noqa
+
     types = listTypes(PRODUCT_NAME)
     content_types, constructors, ftis = process_types(types, PRODUCT_NAME)
 

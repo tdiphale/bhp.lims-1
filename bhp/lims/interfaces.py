@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright 2018 Botswana Harvard Partnership (BHP)
-
+from senaite.impress.interfaces import ILayer as ISenaiteImpressLayer
+from senaite.lims.interfaces import ISenaiteLIMS
 from zope.interface import Interface
 from bika.lims.interfaces import IBikaLIMS
 
 
-class IBhpLIMS(IBikaLIMS):
+class IBhpLIMS(IBikaLIMS, ISenaiteLIMS, ISenaiteImpressLayer):
     """Marker interface that defines a Zope 3 browser layer.
     A layer specific for this add-on product.
     This interface is referred in browserlayer.xml.
@@ -23,3 +24,13 @@ class ICourier(Interface):
 
 class ICouriers(Interface):
     """Folder containing all Couriers"""
+
+
+class IBarcodePrinters(Interface):
+    """Marker interface for the Barcode Printers
+    """
+
+
+class IBarcodePrinter(Interface):
+    """Marker interface for a Barcode Printer
+    """

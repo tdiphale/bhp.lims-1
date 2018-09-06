@@ -12,4 +12,13 @@
   <permission>BIKA: Manage Bika</permission>
  </configlet>
 
+ <configlet title="Barcode Printers" action_id="barcodeprinters"
+            appId="bhp.lims" category="bika" condition_expr=""
+            icon_expr="string:++resource++bhp.lims.static/images/barcodeprinters.png"
+            url_expr="string:$portal_url/bika_setup/barcodeprinters"
+            visible="True"
+            i18n:attributes="title">
+   <permission>BIKA: Manage Bika</permission>
+ </configlet>
+
 </object>

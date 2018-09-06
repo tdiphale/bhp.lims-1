@@ -9,11 +9,6 @@
       type="stickers"
       name="BHP Stickers"/>
 
-  <plone:static
-      directory="reports"
-      type="reports"
-      name="BHP Reports"/>
-
   <browser:page
       for="bika.lims.interfaces.IAnalysisRequest"
       name="requisition"
@@ -69,6 +64,39 @@
       name="samples"
       class="bhp.lims.browser.samples.ClientSamplesView"
       permission="zope2.View"
+      layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
+  <!-- AR Barcode View -->
+  <browser:page
+      for="*"
+      name="generate_barcodes"
+      class=".generate_barcodes.GenerateBarcodesView"
+      permission="bika.lims.ManageAnalysisRequests"
+      layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
+  <browser:page
+      for="*"
+      name="sticker"
+      class=".generate_barcodes.GenerateBarcodesView"
+      permission="zope2.View"
+      layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
+  <!-- Corier Shipment View -->
+  <browser:page
+      for="*"
+      name="courier_shipment"
+      class=".courier_shipment.CourierShipmentView"
+      permission="zope2.View"
+      layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
+  <!-- Register static directory for JS/CSS/Image resources -->
+  <browser:resourceDirectory
+      name="bhp.lims.static"
+      directory="static"
       layer="bhp.lims.interfaces.IBhpLIMS"
   />
 
