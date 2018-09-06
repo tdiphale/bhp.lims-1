@@ -1,7 +1,6 @@
 <tal:report
   i18n:domain="bhp.lims"
-  define="collection python:view.collection;
-          model python:collection[0];
+  define="model python:view.model;
           accredited_symbol string:★;
           outofrange_symbol string:⚠;">
 
@@ -142,23 +141,21 @@
   <tal:render condition="python:True">
     <div class="row section-alerts">
       <div class="col col-sm-12">
-        <tal:model repeat="model collection">
-          <div class="alert alert-danger" tal:condition="model/is_invalid">
-            <h2 class="alert-heading"><span tal:replace="model/getId"/></h2>
-            <div i18n:translate="">This Analysis Request has been invalidated due to erroneously published results</div>
-            <tal:invalidreport tal:define="child model/ChildAnalysisRequest"
-                               tal:condition="child">
-              <span i18n:translate="">This Analysis request has been replaced by</span>
-              <a tal:attributes="href child/absolute_url"
-                 tal:content="child/getId"></a>
-            </tal:invalidreport>
-          </div>
+        <div class="alert alert-danger" tal:condition="model/is_invalid">
+          <h2 class="alert-heading"><span tal:replace="model/getId"/></h2>
+          <div i18n:translate="">This Analysis Request has been invalidated due to erroneously published results</div>
+          <tal:invalidreport tal:define="child model/ChildAnalysisRequest"
+                             tal:condition="child">
+            <span i18n:translate="">This Analysis request has been replaced by</span>
+            <a tal:attributes="href child/absolute_url"
+               tal:content="child/getId"></a>
+          </tal:invalidreport>
+        </div>
 
-          <div class="alert alert-info" tal:condition="model/is_provisional">
-            <h2 class="alert-heading"><span tal:replace="model/getId"/></h2>
-            <div i18n:translate="">Provisional report</div>
-          </div>
-        </tal:model>
+        <div class="alert alert-info" tal:condition="model/is_provisional">
+          <h2 class="alert-heading"><span tal:replace="model/getId"/></h2>
+          <div i18n:translate="">Provisional report</div>
+        </div>
       </div>
     </div>
   </tal:render>
