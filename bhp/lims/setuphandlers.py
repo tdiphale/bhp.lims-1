@@ -92,7 +92,7 @@ def setupHandler(context):
     hide_unused_ar_fields(portal)
 
     # Setup specimen shipment (from clinic) workflow
-    setup_shipment_workflow(portal)
+    setup_bhp_workflow(portal)
 
     # Setup Attachment Types (requisition + delivery)
     setup_attachment_types(portal)
@@ -286,19 +286,21 @@ def sort_ar_fields(portal):
     update_manage_add_storage(portal, storage)
 
 
-def setup_shipment_workflow(portal):
+def setup_bhp_workflow(portal):
     """
     Setup the shipment/delivery workflow for samples:
 
-    1. Clinic submits the form                -----> sample_ordered
-    2. Clinic sends the Sample                --[send_to_lab]--> sample_shipped
-    3. The Courier delivers the Sample to lab --[deliver]--> sample_due
-    4. The Lab receives the Sample            --[receive]--> sample_received
+    1. Clinic submits the form      -- [no_sampling_wf] --> sample_ordered
+    2. Clinic sends the Sample      -- [send_to_lab]    --> sample_shipped
+    3. Delivery to lab              -- [deliver]        --> sample_at_reception
+    4. Process Sample               -- [process]        --> sample_at_reception
+    5. Send to Point of testing     -- [send_to_pot]    --> sample_due
+    6. Receive at Point of Testing  -- [receive]        --> received
 
     """
-    logger.info("*** Setting up shipment workflow ***")
-    setup_shipment_workflow_for(portal, 'bika_sample_workflow')
-    setup_shipment_workflow_for(portal, 'bika_ar_workflow')
+    logger.info("*** Setting up BHP custom workflow ***")
+    setup_bhp_workflow_for(portal, 'bika_sample_workflow')
+    setup_bhp_workflow_for(portal, 'bika_ar_workflow')
 
     def update_objects(query, catalog):
         """Bind the workflow changes to the objects previously created
@@ -311,7 +313,8 @@ def setup_shipment_workflow(portal):
     # system. Although not strictly necessary in a fresh instance, this is
     # interesting for pilot testing. Once stable, this will not be required
     # anymore and eventual changes in workflow will be done in upgrade steps.
-    review_states = ['sample_ordered', 'sample_shipped' 'sample_due']
+    review_states = ['sample_ordered', 'sample_shipped', 'sample_at_reception',
+                     'sample_due']
     portal_types = ['AnalysisRequest', 'Sample', 'SamplePartition']
     query = dict(review_state=review_states, portal_type=portal_types)
     # Analysis Requests live in its own catalog, Samples and Partitions live
@@ -323,17 +326,17 @@ def setup_shipment_workflow(portal):
     update_objects(dict(portal_type='Courier'), 'portal_catalog')
 
 
-def setup_shipment_workflow_for(portal, workflow_id):
+def setup_bhp_workflow_for(portal, workflow_id):
     wtool = api.get_tool("portal_workflow")
     workflow = wtool.getWorkflowById(workflow_id)
 
-    # Create sample_ordered state
+    # STATUSES CREATION
+    # Ordered: Clinic submits the form --[no_sampling_wf]--> sample_ordered
     sample_ordered = workflow.states.get('sample_ordered')
     if not sample_ordered:
         workflow.states.addState('sample_ordered')
         sample_ordered = workflow.states.sample_ordered
     sample_ordered.title = "Ordered"
-    # TODO Review role permissions when sample is ordered
     roles = ('Manager', 'LabManager', 'LabClerk', 'Owner')
     sample_ordered.setPermission(AccessContentsInformation, False, roles)
     sample_ordered.setPermission(ModifyPortalContent, False, roles)
@@ -346,18 +349,15 @@ def setup_shipment_workflow_for(portal, workflow_id):
     sample_ordered.setPermission(ReceiveSample, False, ())
     sample_ordered.setPermission(ScheduleSampling, False, ())
     sample_ordered.transitions = ('send_to_lab', 'reject')
-
-    # The exit transition of 'no_sampling_workflow' is 'sample_ordered'
     workflow.transitions.no_sampling_workflow.new_state_id = 'sample_ordered'
 
-    # Create sample_shipped
+    # Shipped: Clinic sent the sample --[send_to_lab]--> sample_shipped
     sample_shipped = workflow.states.get('sample_shipped')
     if not sample_shipped:
         workflow.states.addState('sample_shipped')
         sample_shipped = workflow.states.sample_shipped
     sample_shipped.title = "Shipped"
     roles = ('Manager', 'LabManager', 'LabClerk', 'Owner')
-    # TODO Review role permissions when sample is shipped
     sample_shipped.setPermission(AccessContentsInformation, False, roles)
     sample_shipped.setPermission(ModifyPortalContent, False, roles)
     sample_shipped.setPermission(View, False, roles)
@@ -370,7 +370,36 @@ def setup_shipment_workflow_for(portal, workflow_id):
     sample_shipped.setPermission(ScheduleSampling, False, ())
     sample_shipped.transitions = ('deliver', 'reject')
 
-    # Create the deliver transition (ordered --> sample_shipped)
+    # At reception: Sample is delivered --[deliver]--> sample_at_reception
+    at_reception = workflow.states.get('sample_at_reception')
+    if not at_reception:
+        workflow.states.addState('sample_at_reception')
+        at_reception = workflow.states.sample_at_reception
+    at_reception.title = "At reception"
+    roles = ('Manager', 'LabManager', 'LabClerk', 'Owner')
+    at_reception.setPermission(AccessContentsInformation, False, roles)
+    at_reception.setPermission(ModifyPortalContent, False, roles)
+    at_reception.setPermission(View, False, roles)
+    at_reception.setPermission(CancelAndReinstate, False, roles)
+    at_reception.setPermission(EditFieldResults, False, ())
+    at_reception.setPermission(EditResults, False, ())
+    at_reception.setPermission(EditSample, False, roles)
+    at_reception.setPermission(PreserveSample, False, ())
+    at_reception.setPermission(ReceiveSample, False, ())
+    at_reception.setPermission(ScheduleSampling, False, ())
+    at_reception.transitions = ('send_to_pot', 'process', 'reject')
+
+    # Process: Create partitions --[process]--> sample_at_reception
+    # No new state is necessary here
+
+    # Sent to PoT: Sample is sent to PoT --[send_to_pot]--> sample_due
+    workflow.states.sample_due.title = "Sent to point of testing"
+
+    # At Point of PoT: Sample is received at PoT --[receive]--> sample_received
+    workflow.states.sample_received.title = "At point of testing"
+
+    # TRANSITIONS CREATION
+    # Send to lab: ordered --> sample_shipped
     if not workflow.transitions.get('send_to_lab'):
         workflow.transitions.addTransition('send_to_lab')
     send_transition = workflow.transitions.send_to_lab
@@ -378,8 +407,7 @@ def setup_shipment_workflow_for(portal, workflow_id):
         title='Send to Lab',
         new_state_id='sample_shipped',
         after_script_name='',
-        actbox_name="Send to Lab",
-    )
+        actbox_name="Send to Lab",)
     guard_send = send_transition.guard or Guard()
     guard_props = {'guard_permissions': 'BIKA: Add Sample',
                    'guard_roles': '',
@@ -387,16 +415,15 @@ def setup_shipment_workflow_for(portal, workflow_id):
     guard_send.changeFromProperties(guard_props)
     send_transition.guard = guard_send
 
-    # Create the deliver transition (sample_shipped --> sample_due)
+    # Deliver: sample_shipped --> sample_at_reception
     if not workflow.transitions.get('deliver'):
         workflow.transitions.addTransition('deliver')
     deliver_transition = workflow.transitions.deliver
     deliver_transition.setProperties(
         title="Receive at reception",
-        new_state_id='sample_due',
+        new_state_id='sample_at_reception',
         after_script_name='',
-        actbox_name="Receive at reception",
-    )
+        actbox_name="Receive at reception",)
     guard_deliver = deliver_transition.guard or Guard()
     guard_props = {'guard_permissions': 'BIKA: Add Sample',
                    'guard_roles': '',
@@ -404,12 +431,41 @@ def setup_shipment_workflow_for(portal, workflow_id):
     guard_deliver.changeFromProperties(guard_props)
     deliver_transition.guard = guard_deliver
 
-    # Change the title "Sample Due" to "Sample Delivered"
-    workflow.states.sample_due.title = "At reception"
-    # Change the title "Sample received" to "At point of testing"
-    workflow.transitions.receive.title="Process"
-    workflow.transitions.receive.actbox_name = "Process"
-    workflow.states.sample_received.title = "At point of testing"
+    # Process: sample_at_reception --> sample_at_reception
+    if not workflow.transitions.get('process'):
+        workflow.transitions.addTransition('process')
+    process_transition = workflow.transitions.process
+    process_transition.setProperties(
+        title="Process",
+        new_state_id='sample_at_reception',
+        after_script_name='',
+        actbox_name="Process", )
+    guard_process = process_transition.guard or Guard()
+    guard_props = {'guard_permissions': 'BIKA: Add Sample',
+                   'guard_roles': '',
+                   'guard_expr': 'python:here.guard_process()'}
+    guard_process.changeFromProperties(guard_props)
+    process_transition.guard = guard_process
+
+    # Send to Pot: sample_at_reception --> sample_due
+    if not workflow.transitions.get('send_to_pot'):
+        workflow.transitions.addTransition('send_to_pot')
+    send2pot_transition = workflow.transitions.send_to_pot
+    send2pot_transition.setProperties(
+        title="Send to point of testing",
+        new_state_id='sample_due',
+        after_script_name='',
+        actbox_name="Send to point of testing", )
+    guard_send2pot = send2pot_transition.guard or Guard()
+    guard_props = {'guard_permissions': 'BIKA: Add Sample',
+                   'guard_roles': '',
+                   'guard_expr': 'python:here.guard_send_to_pot()'}
+    guard_send2pot.changeFromProperties(guard_props)
+    send2pot_transition.guard = guard_send2pot
+
+    # Receive at PoT: sample_due--> sample_received
+    workflow.transitions.receive.title="Receive at point of testing"
+    workflow.transitions.receive.actbox_name = "Receive at point of testing"
 
 
 def update_role_mappings(obj_or_brain, wfs=None, reindex=True):

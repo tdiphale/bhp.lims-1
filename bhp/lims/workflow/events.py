@@ -56,11 +56,6 @@ def after_send_to_lab(obj):
 
     if IAnalysisRequest.providedBy(obj):
 
-        # Transition Analyses to sample_due
-        ans = obj.getAnalyses(full_objects=True, cancellation_state='active')
-        for analysis in ans:
-            doActionFor(analysis, 'sample_due')
-
         # Promote to sample
         sample = obj.getSample()
         if sample:
@@ -76,7 +71,6 @@ def after_deliver(obj):
     logger.info("*** Custom after_deliver transition ***")
 
     if IAnalysisRequest.providedBy(obj):
-
         # Promote to sample
         sample = obj.getSample()
         if sample:
@@ -84,6 +78,35 @@ def after_deliver(obj):
 
     elif ISample.providedBy(obj):
         sample_events._cascade_transition(obj, 'deliver')
+
+
+def after_process(obj):
+    """Event fired after process (Process) transition is triggered
+    """
+    logger.info("*** Custom after_process transition ***")
+
+    if IAnalysisRequest.providedBy(obj):
+        # Generate a derived AR (and Sample) for every single partition
+        create_requests_from_partitions(obj)
+
+    elif ISample.providedBy(obj):
+        # We do not permit partitioning directly from Sample!
+        # sample_events._cascade_transition(obj, 'process')
+        pass
+
+
+def after_send_to_pot(obj):
+    """Event fired after sending to point of testing
+    """
+    logger.info("*** Custom after_send_to_pot transition ***")
+    if IAnalysisRequest.providedBy(obj):
+        # Transition Analyses to sample_due
+        ans = obj.getAnalyses(full_objects=True, cancellation_state='active')
+        for analysis in ans:
+            doActionFor(analysis, 'sample_due')
+
+    elif ISample.providedBy(obj):
+        sample_events._cascade_transition(obj, 'send_to_pot')
 
 
 def after_receive(obj):
@@ -183,6 +206,7 @@ def copy(source, container, skip_fields=None, new_field_values=None):
     renameAfterCreation(destination)
     destination.reindexObject()
     return destination
+
 
 def to_dict(brain_or_object, skip_fields=None):
     if skip_fields is None:

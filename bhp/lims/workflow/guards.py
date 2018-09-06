@@ -64,6 +64,32 @@ def guard_deliver(context):
     return True
 
 
+@security.public
+def guard_process(context):
+    """Guard for process (partitioning) process
+    Only Primary Analysis Requests can be partitioned
+    """
+    sample = get_sample(context)
+    if not sample:
+        return False
+
+    if not api.is_active(sample):
+        return False
+
+    # If the sample is not a primary sample, do not allow processing
+    if sample.Schema()['PrimarySample'].get(sample):
+        return False
+
+    return True
+
+
+@security.public
+def guard_send_to_pot(context):
+    """Guard for sending the sample to the point of testing
+    """
+    return api.is_active(context)
+
+
 def get_sample(instance):
     """Returns the sample associated to this instance, if any. Otherwise,
     returns None"""

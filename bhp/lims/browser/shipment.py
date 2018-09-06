@@ -40,6 +40,22 @@ class ShipmentListingDecorator(object):
         add_review_state(listing=listing, review_state=shipped_rev,
                          before_id='sample_due')
 
+        # Add review state button 'sample_at_reception'
+        at_reception =  {
+            "id": "sample_at_reception",
+            "title": ("At reception"),
+            "contentFilter": {
+                "review_state": ("sample_at_reception",),
+                "sort_on": "created",
+                "sort_order": "descending"},
+            "transitions": [],
+            "custom_transitions": [],
+            "columns": listing.columns.keys(),
+        }
+        shipped_rev['columns'] = listing.columns.keys()
+        add_review_state(listing=listing, review_state=at_reception,
+                         before_id='sample_due')
+
         # Add transition 'send_to_lab'
         add_transition(listing=listing, transition_id='send_to_lab',
                        review_state_ids=['default', 'sample_ordered'])
@@ -47,3 +63,11 @@ class ShipmentListingDecorator(object):
         # Add transition 'deliver'
         add_transition(listing=listing, transition_id='deliver',
                        review_state_ids=['default', 'sample_shipped'])
+
+        # Add transition 'process'
+        add_transition(listing=listing, transition_id='process',
+                       review_state_ids=['default', 'sample_at_reception'])
+
+        # Add transition 'process'
+        add_transition(listing=listing, transition_id='send_to_pot',
+                       review_state_ids=['default', 'sample_at_reception'])
