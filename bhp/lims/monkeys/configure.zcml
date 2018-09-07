@@ -39,6 +39,24 @@
     replacement=".browser.analysisrequest.add2.flush"
   />
 
+  <!-- Analysis Requests ancestors -->
+  <monkey:patch
+    description=""
+    class="bika.lims.content.analysisrequest.AnalysisRequest"
+    original="getAncestors"
+    ignoreOriginal="True"
+    replacement=".content.analysisrequest.getAncestors"
+  />
+
+  <!-- Analysis Requests descendants -->
+  <monkey:patch
+    description=""
+    class="bika.lims.content.analysisrequest.AnalysisRequest"
+    original="getDescendants"
+    ignoreOriginal="True"
+    replacement=".content.analysisrequest.getDescendants"
+  />
+
 
 
 </configure>
