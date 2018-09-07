@@ -4,7 +4,6 @@
 #
 import tempfile
 from base64 import b64encode
-
 from Products.CMFPlone.utils import _createObjectByType
 from Products.CMFPlone.utils import safe_unicode
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
@@ -16,6 +15,8 @@ from bika.lims.browser import BrowserView
 from bika.lims.idserver import renameAfterCreation
 from bika.lims.interfaces import IAnalysisRequest, ISample
 from bika.lims.utils import createPdf
+from barcode.writer import ImageWriter
+from barcode import Code39
 
 
 class DeliveryFormPdf(BrowserView):
@@ -53,10 +54,9 @@ class DeliveryFormPdf(BrowserView):
         img_str = img.read()
         return "data:image/png;base64,{}".format(b64encode(img_str))
 
-
-def generate_delivery_pdf(context, ars_or_samples):
-    if not ars_or_samples:
-        logger.warn("No Analysis Requests or Samples provided")
+def generate_delivery_pdf(ar_or_sample):
+    if not ar_or_sample:
+        logger.warn("No Analysis Request or Sample provided")
         return
 
     if ISample.providedBy(ars_or_samples) or \

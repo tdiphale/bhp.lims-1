@@ -41,7 +41,7 @@ class RequisitionFormPdf(BrowserView):
         return contact.getJobTitle()
 
     def get_barcode(self, instance):
-        ean = Code39(u''+str(instance.id), writer=ImageWriter())
+        ean = Code39(u''+str(instance.id), writer=ImageWriter(),add_checksum=False)
         ean.default_writer_options.update(font_size=20)
         barcode_img = tempfile.mktemp(suffix='.png')
         localFile = open(barcode_img, 'w')
