@@ -6,8 +6,10 @@ def getAncestors(self, all_ancestors=True):
     param all_ancestors: include all ancestors, not only the parent
     """
     parent = self.getParentAnalysisRequest()
+    if not parent:
+        return list()
     if not all_ancestors:
-        return parent
+        return [parent]
     return [parent] + getAncestors(parent, all_ancestors=True)
 
 
