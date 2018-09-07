@@ -54,14 +54,15 @@ class DeliveryFormPdf(BrowserView):
         img_str = img.read()
         return "data:image/png;base64,{}".format(b64encode(img_str))
 
-def generate_delivery_pdf(ar_or_sample):
-    if not ar_or_sample:
-        logger.warn("No Analysis Request or Sample provided")
+
+def generate_delivery_pdf(context, ars_or_samples):
+    if not ars_or_samples:
+        logger.warn("No Analysis Requests or Samples provided")
         return
 
     if ISample.providedBy(ars_or_samples) or \
         IAnalysisRequest.providedBy(ars_or_samples):
-        return generate_delivery_pdf([ars_or_samples])
+        return generate_delivery_pdf(context, [ars_or_samples])
 
     if not isinstance(ars_or_samples, list):
         logger.warn("Type not supported: {}".format(repr(ars_or_samples)))
