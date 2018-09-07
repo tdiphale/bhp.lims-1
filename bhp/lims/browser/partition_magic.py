@@ -33,10 +33,6 @@ class PartitionMagicView(BrowserView):
         form_create = form.get("create", False)
         form_cancel = form.get("cancel", False)
 
-
-        if form_submitted:
-            import pdb; pdb.set_trace()
-
         # objs = self.get_objects()
 
         # # No ARs selected
