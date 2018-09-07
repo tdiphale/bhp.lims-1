@@ -13,6 +13,7 @@ from bhp.lims import bhpMessageFactory as _
 from bhp.lims import logger
 from bhp.lims.specscalculations import get_xls_specifications
 from bika.lims import api
+from bika.lims.catalog.analysis_catalog import CATALOG_ANALYSIS_LISTING
 from bika.lims.catalog.analysisrequest_catalog import \
     CATALOG_ANALYSIS_REQUEST_LISTING
 from bika.lims.idserver import renameAfterCreation
@@ -35,6 +36,7 @@ CONTROLPANELS = [
 
 INDEXES = [
     # Tuples of (catalog, id, indexed attribute, type)
+    ("bika_analysis_catalog", "getAncestorsUIDs", "getAncestorsUIDs", "KeywordIndex")
 ]
 
 COLUMNS = [
@@ -76,6 +78,9 @@ def setupHandler(context):
 
     portal = context.getSite()
 
+    # Setup Catalogs
+    setup_catalogs(portal)
+
     # Run installers
     setup_laboratory(portal)
 
@@ -114,9 +119,6 @@ def setupHandler(context):
 
     # Setup printer stickers
     setup_printer_stickers(portal)
-
-    # Setup Catalogs
-    setup_catalogs(portal)
 
     logger.info("BHP setup handler [DONE]")
 

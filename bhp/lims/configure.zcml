@@ -28,6 +28,7 @@
   <include package=".monkeys"/>
   <include package=".controlpanel"/>
   <include package=".impress"/>
+  <include package=".catalog"/>
 
   <!-- LIMS Export -->
   <browser:page

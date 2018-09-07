@@ -57,6 +57,20 @@
     replacement=".content.analysisrequest.getDescendants"
   />
 
+  <!-- Mask analyses with those from descendants -->
+  <monkey:patch
+    description=""
+    class="bika.lims.browser.fields.aranalysesfield.ARAnalysesField"
+    original="get"
+    replacement=".browser.fields.aranalysesfield.get"
+  />
 
+  <!-- Mask analyses with those from descendants -->
+  <monkey:patch
+    description=""
+    class="Products.ZCatalog.ZCatalog.ZCatalog"
+    original="searchResults"
+    replacement=".zcatalog.searchResults"
+  />
 
 </configure>
