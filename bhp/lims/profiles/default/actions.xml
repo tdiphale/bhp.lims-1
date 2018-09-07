@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<object xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+        name="portal_actions">
+
+  <!-- Portal Tabs -->
+  <object name="portal_tabs" meta_type="CMF Action Category">
+    <object name="dashboard" meta_type="CMF Action" i18n:domain="bhp">
+      <property name="title" i18n:translate="">Dashboard</property>
+      <property name="description" i18n:translate=""/>
+      <property name="url_expr">string:$portal_url/bika-dashboard</property>
+      <property name="link_target"/>
+      <property name="icon_expr"/>
+      <property name="available_expr"/>
+      <property name="permissions">
+        <element value="BIKA: Manage Bika"/>
+      </property>
+      <property name="visible">True</property>
+    </object>
+  </object>
+
+  <!-- User Actions -->
+  <object name="user" meta_type="CMF Action Category">
+    <property name="title"></property>
+    <object name="dashboard" meta_type="CMF Action" i18n:domain="plone">
+      <property name="title" i18n:translate="">Dashboard</property>
+      <property name="description" i18n:translate=""></property>
+      <property name="url_expr">string:${portal_url}/dashboard</property>
+      <property name="link_target"></property>
+      <property name="icon_expr"></property>
+      <property name="available_expr">python:member is not None</property>
+      <property name="permissions">
+        <element value="Portlets: Manage own portlets"/>
+      </property>
+      <property name="visible">False</property>
+    </object>
+    <object name="preferences" meta_type="CMF Action" i18n:domain="plone">
+      <property name="title" i18n:translate="">Preferences</property>
+      <property name="description" i18n:translate=""></property>
+      <property
+        name="url_expr">string:${globals_view/navigationRootUrl}/@@personal-preferences</property>
+      <property name="link_target"></property>
+      <property name="icon_expr"></property>
+      <property name="available_expr">python:member is not None</property>
+      <property name="permissions">
+        <element value="View"/>
+      </property>
+      <property name="visible">False</property>
+    </object>
+  </object>
+
+</object>

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<object>
+
+  <!-- Hidden vielets in plone.portalheader -->
+  <hidden manager="plone.portalheader" skinname="*" purge="True">
+    <viewlet name="plone.searchbox"/>
+  </hidden>
+
+  <!-- Hidden vielets in plone.abovecontent -->
+  <hidden manager="plone.abovecontent" skinname="*" purge="True">
+  </hidden>
+
+  <!-- Hidden vielets in plone.portalfooter -->
+  <hidden manager="plone.portalfooter" skinname="*" purge="True">
+  </hidden>
+
+</object>
