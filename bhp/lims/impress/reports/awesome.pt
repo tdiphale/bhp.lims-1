@@ -176,7 +176,7 @@
                 <td class="cell-spacing"></td>
                 <td class="font-weight-bold">Study Code</td>
                 <td class="value">
-                    <span tal:content="client/TaxNumber"></span>
+                   BHP <span tal:content="client/TaxNumber"></span>
                 </td>
             </tr>
             <tr>
