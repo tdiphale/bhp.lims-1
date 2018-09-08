@@ -18,6 +18,19 @@ class AnalysisRequestsView(BaseView):
         super(AnalysisRequestsView, self).__init__(context, request)
         init_listing(self)
 
+        partition_magic = {
+            "id": "partition_magic",
+            "title": _("Partition"),
+            "url": "partition_magic"
+        }
+
+        for rs in self.review_states:
+            if rs.get("custom_transitions") is None:
+                rs["custom_transitions"] = []
+            transitions = rs["custom_transitions"]
+            transitions.append(partition_magic)
+            rs["custom_transitions"] = transitions
+
     def folderitem(self, obj, item, index):
         item = BaseView.folderitem(self, obj, item, index)
         return folder_listing_item(self, obj, item, index)

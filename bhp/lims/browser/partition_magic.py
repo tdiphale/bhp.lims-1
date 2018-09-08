@@ -1,14 +1,40 @@
 # -*- coding: utf-8 -*-
 
 from collections import OrderedDict
+from collections import defaultdict
 
+from bhp.lims import bhpMessageFactory as _
 from bhp.lims import logger
 from bhp.lims.decorators import returns_super_model
 from bika.lims import api
+from bika.lims.interfaces import IProxyField
+from bika.lims.utils.analysisrequest import create_analysisrequest as crar
 from Products.Five.browser import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 DEFAULT_NUMBER_OF_PARTITIONS = 0
+
+PARTITION_SKIP_FIELDS = [
+    "Analyses",
+    "Attachment",
+    "Client",
+    "DefaultContainerType",
+    "Digest",
+    "PrimarySample",
+    "Profile",
+    "Profiles",
+    "RejectionReasons",
+    "Remarks",
+    "ResultsInterpretation",
+    "Sample",
+    "SampleType",
+    "Specification",
+    "Template",
+    "creation_date",
+    "id",
+    "modification_date",
+    "ParentAnalysisRequest",
+]
 
 
 class PartitionMagicView(BrowserView):
@@ -30,17 +56,109 @@ class PartitionMagicView(BrowserView):
 
         # Buttons
         form_preview = form.get("button_preview", False)
-        form_create = form.get("create", False)
-        form_cancel = form.get("cancel", False)
+        form_create = form.get("button_create", False)
+        form_cancel = form.get("button_cancel", False)
 
-        # objs = self.get_objects()
+        objs = self.get_objects()
 
-        # # No ARs selected
-        # if not objs:
-        #     return self.redirect(message=_("No items selected"),
-        #                          level="warning")
+        # No ARs selected
+        if not objs:
+            return self.redirect(message=_("No items selected"),
+                                 level="warning")
+
+        # Handle preview
+        if form_submitted and form_preview:
+            logger.info("*** PREVIEW ***")
+
+        # Handle create
+        if form_submitted and form_create:
+            logger.info("*** CREATE PARTITIONS ***")
+
+            partitions = []
+
+            # create the partitions
+            for partition in form.get("partitions"):
+                primary_uid = partition.get("primary_uid")
+                sampletype_uid = partition.get("sampletype_uid")
+                analyses_uids = partition.get("analyses")
+
+                partition = self.create_partition(
+                    primary_uid, sampletype_uid, analyses_uids)
+                partitions.append(partition)
+                logger.info("Successfully created partition: {}".format(
+                    api.get_path(partition)))
+
+            message = _("Created {} partitions: {}".format(
+                len(partitions), ", ".join(map(api.get_title, partitions))))
+            return self.redirect(message=message)
+
+        # Handle cancel
+        if form_submitted and form_cancel:
+            logger.info("*** CANCEL ***")
+            return self.redirect(message=_("Partitioning canceled"))
 
         return self.template()
+
+    def create_partition(self, primary_uid, sampletype_uid, analyses_uids):
+        """Create a new partition (AR)
+        """
+        logger.info("*** CREATE PARTITION ***")
+
+        ar = self.get_object_by_uid(primary_uid)
+        sample = ar.getSample()
+
+        record = {
+            "PrimarySample": api.get_uid(sample),
+            "InternalUse": True,
+            "SampleType": sampletype_uid,
+        }
+
+        for fieldname, field in api.get_fields(ar).items():
+            # if self.is_proxy_field(field):
+            #     logger.info("Skipping proxy field {}".format(fieldname))
+            #     continue
+            if self.is_computed_field(field):
+                logger.info("Skipping computed field {}".format(fieldname))
+                continue
+            if fieldname in PARTITION_SKIP_FIELDS:
+                logger.info("Skipping field {}".format(fieldname))
+                continue
+            fieldvalue = field.get(ar)
+            record[fieldname] = fieldvalue
+            logger.info("Update record '{}': {}".format(
+                fieldname, repr(fieldvalue)))
+
+        client = ar.getClient()
+        # se assume to have
+        analyses = map(self.get_object_by_uid, analyses_uids)
+        services = map(lambda an: an.getAnalysisService(), analyses)
+
+        ar = crar(
+            client,
+            self.request,
+            record,
+            analyses=services,
+            specifications=self.get_specifications_for(ar)
+        )
+        return ar
+
+    def get_specifications_for(self, ar):
+        """Returns a mapping of service uid -> specification
+        """
+        spec = ar.getSpecification()
+        if not spec:
+            return []
+        return spec.getResultsRange()
+
+    def is_proxy_field(self, field):
+        """Checks if the field is a proxy field
+        """
+        return IProxyField.providedBy(field)
+
+    def is_computed_field(self, field):
+        """Checks if the field is a coumputed field
+        """
+        return field.type == "computed"
 
     def get_ar_data(self):
         """Returns a list of AR data
@@ -51,6 +169,7 @@ class PartitionMagicView(BrowserView):
                 "analyses": self.get_analysis_data_for(obj),
                 "sampletype": self.get_base_info(obj.getSampleType()),
                 "number_of_partitions": self.get_number_of_partitions_for(obj),
+                "template": self.get_template_data_for(obj),
             })
             yield info
 
@@ -94,25 +213,64 @@ class PartitionMagicView(BrowserView):
         return obj_or_objs
 
     def get_analysis_data_for(self, ar):
-        """Return the Analysis data for this ar
+        """Return the Analysis data for this AR
         """
         analyses = ar.getAnalyses()
         out = []
         for an in analyses:
-            out.append(self.get_base_info(an))
+            info = self.get_base_info(an)
+            info.update({
+                "service_uid": an.getServiceUID,
+            })
+            out.append(info)
         return out
+
+    def get_template_data_for(self, ar):
+        """Return the Template data for this AR
+        """
+        info = None
+        template = ar.getTemplate()
+
+        if template:
+            info = self.get_base_info(template)
+
+            analyses = template.getAnalyses()
+            partition_analyses = map(
+                lambda x: (x.get("partition"), x.get("service_uid")), analyses)
+
+            analyses_by_partition = defaultdict(list)
+            for partition, service_uid in partition_analyses:
+                analyses_by_partition[partition].append(service_uid)
+
+            partitions = map(lambda p: p.get("part_id"),
+                             template.getPartitions())
+            info.update({
+                "analyses": analyses_by_partition,
+                "partitions": partitions,
+            })
+        else:
+            info = {
+                "analyses": [],
+                "partitions": [],
+            }
+        return info
 
     def get_number_of_partitions_for(self, ar):
         """Return the number of selected partitions
         """
-        uid = api.get_uid(ar)
-        num = self.request.get("primary", {}).get(uid, DEFAULT_NUMBER_OF_PARTITIONS)
+        template = ar.getTemplate()
+        # get the number of partitions from the template
+        if template:
+            num = len(template.getPartitions())
+        else:
+            # fetch the number of partitions from the request
+            uid = api.get_uid(ar)
+            num = self.request.get("primary", {}).get(
+                uid, DEFAULT_NUMBER_OF_PARTITIONS)
         try:
             num = int(num)
         except (TypeError, ValueError):
             num = DEFAULT_NUMBER_OF_PARTITIONS
-        if num < 0:
-            return 0
         return num
 
     def get_base_info(self, obj):

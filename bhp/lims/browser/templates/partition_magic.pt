@@ -51,6 +51,11 @@
             <input tal:replace="structure context/@@authenticator/authenticator"/>
 
             <tal:ars repeat="ar view/get_ar_data">
+
+              <!-- Remember the initial UIDs coming in -->
+              <input type="hidden" name="uids:list" tal:attributes="value ar/uid"/>
+
+              <!-- Partition Magic Table -->
               <table class="table table-bordered" style="margin-bottom:5em;">
                 <thead>
                   <tr>
@@ -60,7 +65,10 @@
                         <div class="col-sm-8">
                           <div class="text-muted">Primary Analysis Request</div>
                           <h2>
+                            <!-- AR Title -->
                             <span class="text-primary" tal:content="ar/title"/>
+                            <!-- Template Title -->
+                            <small tal:content="ar/template/title|nothing"/>
                           </h2>
                           <!-- Primary AR UID -->
                           <input name="primary.uid:record"
@@ -89,7 +97,9 @@
                   </tr>
                 </thead>
 
-                <tbody tal:define="number_of_partitions ar/number_of_partitions">
+                <tbody tal:define="number_of_partitions ar/number_of_partitions;
+                                   template python:ar.get('template', {});
+                                   partitions python:template.get('partitions')">
                   <!-- No Partitions -->
                   <tr tal:condition="python:not number_of_partitions">
                     <td>
@@ -97,17 +107,15 @@
                     </td>
                   </tr>
                   <!-- Partitions -->
-                  <tr tal:repeat="partition python:range(number_of_partitions)">
+                  <tr tal:repeat="partition python:partitions or range(number_of_partitions);">
                     <td style="background-color: #fff;">
 
                       <!-- Partition number -->
                       <div class="col-sm-8">
-                        <h4 class="text-muted">
-                          <span tal:content="ar/title">AR</span>
-                          &rarr;
+                        <h3 class="text-muted">
                           <span i18n:translate="">Partition</span>
                           <strong tal:content="repeat/partition/number"/>
-                        </h4>
+                        </h3>
                         <!-- Remember the primary uid of this partition -->
                         <input type="hidden" name="partitions.primary_uid:records" tal:attributes="value ar/uid"/>
                       </div>
@@ -142,10 +150,11 @@
                             <col>
                           </colgroup>
                           <tr tal:repeat="analysis ar/analyses" class="analysis">
-                            <td class="text-center">
+                            <td class="text-center" tal:define="service_uid analysis/service_uid">
                               <input name="partitions.analyses:records:list"
                                      type="checkbox"
-                                     tal:attributes="value analysis/uid;"/>
+                                     tal:attributes="value analysis/uid;
+                                                     checked python:service_uid in template.get('analyses', {}).get(partition, [])"/>
                             </td>
                             <td class="text-info">
                               <span tal:content="analysis/title"/>
