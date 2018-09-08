@@ -27,7 +27,7 @@ def _promote_transition(obj, transition_id):
 
 
 def _cascade_transition(obj, transition_id):
-    derived_ars = obj.getDerivedAnalysisRequests()
+    derived_ars = obj.getDescendants()
     for ar in derived_ars:
         doActionFor(ar, transition_id)
 
