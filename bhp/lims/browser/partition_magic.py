@@ -6,6 +6,7 @@ from collections import defaultdict
 from bhp.lims import bhpMessageFactory as _
 from bhp.lims import logger
 from bhp.lims.decorators import returns_super_model
+from bhp.lims.workflow.events import force_receive
 from bika.lims import api
 from bika.lims.interfaces import IProxyField
 from bika.lims.utils.analysisrequest import create_analysisrequest as crar
@@ -18,7 +19,6 @@ PARTITION_SKIP_FIELDS = [
     "Analyses",
     "Attachment",
     "Client",
-    "DefaultContainerType",
     "Digest",
     "PrimarySample",
     "Profile",
@@ -28,7 +28,6 @@ PARTITION_SKIP_FIELDS = [
     "ResultsInterpretation",
     "Sample",
     "SampleType",
-    "Specification",
     "Template",
     "creation_date",
     "id",
@@ -88,8 +87,12 @@ class PartitionMagicView(BrowserView):
                 logger.info("Successfully created partition: {}".format(
                     api.get_path(partition)))
 
+                force_receive(partition)
+
             message = _("Created {} partitions: {}".format(
                 len(partitions), ", ".join(map(api.get_title, partitions))))
+
+
             return self.redirect(message=message)
 
         # Handle cancel
