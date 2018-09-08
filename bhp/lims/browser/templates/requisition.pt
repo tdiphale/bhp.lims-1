@@ -126,7 +126,7 @@
     <div class="requisition"
          tal:define="sample python:analysisrequest.getSample();
                      client python:analysisrequest.aq_parent;
-                     contact python:analysisrequest.getContactFullName().split()">
+                     contact python:analysisrequest.getContactFullName()">
       <div class="page-header">
         <div class='header-part barcode-container'>
           <p class="lab-logo">
@@ -222,8 +222,8 @@
               <div class="value" tal:content="python: client.getTaxNumber()"></div>
             </div>
             <div class="clearfix"></div>
-            <h2>Clinician Initials: <span tal:condition="python: contact and len(contact) > 1"
-                                          tal:content="python: contact[0][0]+' '+contact[1][0] "></span></h2>
+            <h2>Clinician: <span tal:condition="python: contact and len(contact) > 1"
+                                          tal:content="python: contact"></span></h2>
             <h2>Study coordinator <br/>
               <span tal:content="python: client.Title()"></span>
               <br/>
