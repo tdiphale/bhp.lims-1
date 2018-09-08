@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from bhp.lims import api as _api
 from bhp.lims import logger
 from senaite.impress.analysisrequest.reportview import MultiReportView
 from senaite.impress.analysisrequest.reportview import SingleReportView
@@ -14,6 +15,14 @@ class BhpSingleReportView(SingleReportView):
         logger.info("BhpSingleReportView::__init__:model={}"
                     .format(model))
         super(BhpSingleReportView, self).__init__(model, request)
+
+    def get_age_str(self, model):
+        years, months, days = _api.get_age(model.DateOfBirth, model.DateSampled)
+        years = years and "{}y".format(years) or None
+        months = months and "{}m".format(months) or None
+        days = days and "{}d".format(days) or None
+        age = filter(lambda val: val != None, [years, months, days])
+        return " ".join(age)
 
 
 class BhpMultiReportView(MultiReportView):

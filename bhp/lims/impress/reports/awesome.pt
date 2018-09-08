@@ -240,7 +240,7 @@
             <tr>
                 <td class="font-weight-bold">Age</td>
                 <td class="value">
-                    <span></span>
+                    <span tal:content="python:view.get_age_str(model)"></span>
                 </td>
                 <td class="cell-spacing"></td>
                 <td class="font-weight-bold">Date of Birth</td>
@@ -425,7 +425,7 @@
                             max python: max if max else 0;
                             err python: str(rr.get('error',0)).replace(',','.');
                             err python: err if err else 0;
-                            res python: str(analysis.get('result',0)).replace(',','.');
+                            res python: str(analysis.getResult()).replace(',','.');
                             res python: res if res else 0;
                             dataspecs python: '[%s,%s,%s,%s]' % (res,min,max,err);">
                       <div class="range-chart"
