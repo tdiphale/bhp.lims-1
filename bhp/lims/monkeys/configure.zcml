@@ -73,4 +73,11 @@
     replacement=".zcatalog.searchResults"
   />
 
+  <!-- Promote after transitions to ARs ancestors -->
+  <monkey:patch
+    description=""
+    class="bika.lims.workflow.analysisrequest.events"
+    original="_promote_transition"
+    replacement=".workflow.analysisrequest.events._promote_transition"
+  />
 </configure>
