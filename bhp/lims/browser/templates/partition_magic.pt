@@ -99,7 +99,7 @@
 
                 <tbody tal:define="number_of_partitions ar/number_of_partitions;
                                    template python:ar.get('template', {});
-                                   partitions python:template.get('partitions')">
+                                   partitions python:template.get('partitions', []);">
                   <!-- No Partitions -->
                   <tr tal:condition="python:not number_of_partitions">
                     <td>
@@ -107,63 +107,66 @@
                     </td>
                   </tr>
                   <!-- Partitions -->
-                  <tr tal:repeat="partition python:partitions or range(number_of_partitions);">
-                    <td style="background-color: #fff;">
+                  <tr tal:repeat="part_index python:range(number_of_partitions);">
+                    <tal:partition define="default_part_name python:'part-%s' % str(part_index + 1);
+                                           partition python:part_index<len(partitions) and partitions[part_index] or default_part_name">
 
-                      <!-- Partition number -->
-                      <div class="col-sm-8">
-                        <h3 class="text-muted">
-                          <span i18n:translate="">Partition</span>
-                          <strong tal:content="repeat/partition/number"/>
-                        </h3>
-                        <!-- Remember the primary uid of this partition -->
-                        <input type="hidden" name="partitions.primary_uid:records" tal:attributes="value ar/uid"/>
-                      </div>
-
-                      <!-- Sample Type Selection -->
-                      <div class="col-sm-4">
-                        <label i18n:translate="" for="sampletype">
-                          Sample Type
-                        </label>
-                        <div class="form-group">
-                          <select name="partitions.sampletype_uid:records" class="form-control">
-                            <tal:options repeat="sampletype view/get_sampletype_data"
-                                         define="ar_sampletype_uid ar/sampletype/uid">
-                              <option tal:attributes="value sampletype/uid;
-                                                      selected python:sampletype.get('uid') == ar_sampletype_uid and 'selected' or ''"
-                                      tal:content="sampletype/title">
-                                Sample Type
-                              </option>
-                            </tal:options>
-                          </select>
+                      <td style="background-color: #fff;">
+                        <!-- Partition number -->
+                        <div class="col-sm-8">
+                          <h3 class="text-muted">
+                            <span i18n:translate="">Partition</span>
+                            <strong tal:content="repeat/part_index/number"/>
+                          </h3>
+                          <!-- Remember the primary uid of this partition -->
+                          <input type="hidden" name="partitions.primary_uid:records" tal:attributes="value ar/uid"/>
                         </div>
-                      </div>
 
-                      <!-- Partition Analyses -->
-                      <div class="col-sm-12">
-                        <label i18n:translate="">
-                          Select Partition Analyses
-                        </label>
-                        <table class="table table-hover">
-                          <colgroup>
-                            <col style="width: 50px;">
-                            <col>
-                          </colgroup>
-                          <tr tal:repeat="analysis ar/analyses" class="analysis">
-                            <td class="text-center" tal:define="service_uid analysis/service_uid">
-                              <input name="partitions.analyses:records:list"
-                                     type="checkbox"
-                                     tal:attributes="value analysis/uid;
-                                                     checked python:service_uid in template.get('analyses', {}).get(partition, [])"/>
-                            </td>
-                            <td class="text-info">
-                              <span tal:content="analysis/title"/>
-                            </td>
-                          </tr>
-                        </table>
-                      </div>
+                        <!-- Sample Type Selection -->
+                        <div class="col-sm-4">
+                          <label i18n:translate="" for="sampletype">
+                            Sample Type
+                          </label>
+                          <div class="form-group">
+                            <select name="partitions.sampletype_uid:records" class="form-control">
+                              <tal:options repeat="sampletype view/get_sampletype_data"
+                                          define="ar_sampletype_uid ar/sampletype/uid">
+                                <option tal:attributes="value sampletype/uid;
+                                                        selected python:sampletype.get('uid') == ar_sampletype_uid and 'selected' or ''"
+                                        tal:content="sampletype/title">
+                                  Sample Type
+                                </option>
+                              </tal:options>
+                            </select>
+                          </div>
+                        </div>
 
-                    </td>
+                        <!-- Partition Analyses -->
+                        <div class="col-sm-12">
+                          <label i18n:translate="">
+                            Select Partition Analyses
+                          </label>
+                          <table class="table table-hover">
+                            <colgroup>
+                              <col style="width: 50px;">
+                              <col>
+                            </colgroup>
+                            <tr tal:repeat="analysis ar/analyses" class="analysis">
+                              <td class="text-center" tal:define="service_uid analysis/service_uid">
+                                <input name="partitions.analyses:records:list"
+                                      type="checkbox"
+                                      tal:attributes="value analysis/uid;
+                                                      checked python:service_uid in template.get('analyses', {}).get(partition, [])"/>
+                              </td>
+                              <td class="text-info">
+                                <span tal:content="analysis/title"/>
+                              </td>
+                            </tr>
+                          </table>
+                        </div>
+
+                      </td>
+                      </tal:partition>
                   </tr>
 
                 </tbody>

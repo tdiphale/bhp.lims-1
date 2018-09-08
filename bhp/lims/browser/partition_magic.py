@@ -261,15 +261,17 @@ class PartitionMagicView(BrowserView):
     def get_number_of_partitions_for(self, ar):
         """Return the number of selected partitions
         """
-        template = ar.getTemplate()
-        # get the number of partitions from the template
-        if template:
-            num = len(template.getPartitions())
-        else:
-            # fetch the number of partitions from the request
-            uid = api.get_uid(ar)
-            num = self.request.get("primary", {}).get(
-                uid, DEFAULT_NUMBER_OF_PARTITIONS)
+        # fetch the number of partitions from the request
+        uid = api.get_uid(ar)
+        num = self.request.get("primary", {}).get(uid)
+
+        if num is None:
+            # get the number of partitions from the template
+            template = ar.getTemplate()
+            if template:
+                num = len(template.getPartitions())
+            else:
+                num = DEFAULT_NUMBER_OF_PARTITIONS
         try:
             num = int(num)
         except (TypeError, ValueError):
