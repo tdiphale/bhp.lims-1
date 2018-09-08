@@ -87,13 +87,17 @@ class PartitionMagicView(BrowserView):
                 logger.info("Successfully created partition: {}".format(
                     api.get_path(partition)))
 
+                # Force the reception of the partition
                 force_receive(partition)
 
             message = _("Created {} partitions: {}".format(
                 len(partitions), ", ".join(map(api.get_title, partitions))))
 
-
-            return self.redirect(message=message)
+            # Redirect to the printing view
+            uids = ','.join(map(lambda part: api.get_uid(part), partitions))
+            url = "{}{}".format(self.context.absolute_url(),
+                                '/print_view?uids='+uids)
+            return self.request.response.redirect(url)
 
         # Handle cancel
         if form_submitted and form_cancel:
