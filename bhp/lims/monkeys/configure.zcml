@@ -39,6 +39,45 @@
     replacement=".browser.analysisrequest.add2.flush"
   />
 
+  <!-- Analysis Requests ancestors -->
+  <monkey:patch
+    description=""
+    class="bika.lims.content.analysisrequest.AnalysisRequest"
+    original="getAncestors"
+    ignoreOriginal="True"
+    replacement=".content.analysisrequest.getAncestors"
+  />
 
+  <!-- Analysis Requests descendants -->
+  <monkey:patch
+    description=""
+    class="bika.lims.content.analysisrequest.AnalysisRequest"
+    original="getDescendants"
+    ignoreOriginal="True"
+    replacement=".content.analysisrequest.getDescendants"
+  />
 
+  <!-- Mask analyses with those from descendants -->
+  <monkey:patch
+    description=""
+    class="bika.lims.browser.fields.aranalysesfield.ARAnalysesField"
+    original="get"
+    replacement=".browser.fields.aranalysesfield.get"
+  />
+
+  <!-- Mask analyses with those from descendants -->
+  <monkey:patch
+    description=""
+    class="Products.ZCatalog.ZCatalog.ZCatalog"
+    original="searchResults"
+    replacement=".zcatalog.searchResults"
+  />
+
+  <!-- Promote after transitions to ARs ancestors -->
+  <monkey:patch
+    description=""
+    class="bika.lims.workflow.analysisrequest.events"
+    original="_promote_transition"
+    replacement=".workflow.analysisrequest.events._promote_transition"
+  />
 </configure>
