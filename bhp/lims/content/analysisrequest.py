@@ -294,6 +294,7 @@ class AnalysisRequestSchemaModifier(object):
                                              'calculation')
         schema['DefaultContainerType'].widget.label = _("Container Type")
         schema['DefaultContainerType'].widget.description = ""
+        schema['DefaultContainerType'].required = 1
 
         # Fields to always be hided
         hide = ["AdHoc",
