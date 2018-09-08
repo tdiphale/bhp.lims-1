@@ -7,6 +7,7 @@ from bhp.lims.api import get_field_value
 from bhp.lims.workflow import events
 from bhp.lims.workflow.guards import guard_send_to_lab
 from bika.lims import PMF
+from bika.lims import api
 from bika.lims.browser.analysisrequest.workflow import \
     AnalysisRequestWorkflowAction as BaseAnalysisRequestWorkflowAction
 from bika.lims.browser.client.workflow import ClientWorkflowAction
@@ -61,6 +62,12 @@ class SampleARWorkflowAction(BaseAnalysisRequestWorkflowAction):
             self.request.response.redirect(self.destination_url)
         else:
             return
+
+    def  workflow_action_process(self):
+        # Partition magic view
+        url = "{}{}".format(self.context.absolute_url(),
+                            '/partition_magic?uids=' + api.get_uid(self.context))
+        self.request.response.redirect(url)
 
     def workflow_action_download_requisition(self):
         if ISample.providedBy(self.context):
@@ -121,4 +128,13 @@ class AnalysisRequestsWorkflowAction(ClientWorkflowAction):
             return
         url = "{}{}".format(self.context.absolute_url(),
                             '/courier_shipment?uids=' + uids)
+        self.request.response.redirect(url)
+
+    def  workflow_action_process(self):
+        # Partition magic view
+        uids = ','.join(self.request.form.get("uids", ""))
+        if not uids:
+            return
+        url = "{}{}".format(self.context.absolute_url(),
+                            '/partition_magic?uids=' + uids)
         self.request.response.redirect(url)

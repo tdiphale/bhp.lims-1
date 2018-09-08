@@ -83,6 +83,15 @@
       layer="bhp.lims.interfaces.IBhpLIMS"
   />
 
+  <!-- AR Partition Magic View -->
+  <browser:page
+      for="*"
+      name="partition_magic"
+      class=".partition_magic.PartitionMagicView"
+      permission="bika.lims.ManageAnalysisRequests"
+      layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
   <browser:page
       for="*"
       name="sticker"
