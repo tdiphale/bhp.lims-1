@@ -33,6 +33,7 @@ PARTITION_SKIP_FIELDS = [
     "id",
     "modification_date",
     "ParentAnalysisRequest",
+    "PrimaryAnalysisRequest"
 ]
 
 
