@@ -10,6 +10,6 @@ def _promote_transition(obj, transition_id):
         doActionFor(sample, transition_id)
 
     # Promote the transition to its parent
-    parent = obj.getParentAnalysisRequest()
+    parent = obj.getPrimaryAnalysisRequest()
     if parent:
         doActionFor(parent, transition_id)

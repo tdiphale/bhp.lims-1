@@ -21,7 +21,7 @@ def _promote_transition(obj, transition_id):
     if sample:
         doActionFor(sample, transition_id)
 
-    parent_ar = obj.getParentAnalysisRequest()
+    parent_ar = obj.getPrimaryAnalysisRequest()
     if parent_ar:
         doActionFor(parent_ar, transition_id)
 
@@ -185,7 +185,7 @@ def after_publish(obj):
             doActionFor(analysis, 'publish')
 
         # Promote to parent AR
-        parent_ar = obj.getParentAnalysisRequest()
+        parent_ar = obj.getPrimaryAnalysisRequest()
         if parent_ar:
             doActionFor(parent_ar, "publish")
 
@@ -211,7 +211,7 @@ def create_requests_from_partitions(analysis_request):
     ar_proxies = map(lambda field: field.getName(), ar_proxies)
     skip_fields = ["Client", "Sample", "PrimarySample", "Template", "Profile",
                    "Profiles", "Analyses", "ParentAnalysisRequest",
-                   "RejectionReasons", "Remarks"]
+                   "PrimaryAnalysisRequest", "RejectionReasons", "Remarks"]
     skip_fields.extend(ar_proxies)
     for part in partitions:
         analyses = part.getAnalyses()
@@ -226,7 +226,7 @@ def create_requests_from_partitions(analysis_request):
 
         # Create a new Analysis Request for this Sample and analyses
         field_values = dict(Sample=sample_uid, Analyses=analyses,
-                            ParentAnalysisRequest=analysis_request)
+                            PrimaryAnalysisRequest=analysis_request)
         ar_copy = copy(analysis_request, container=client,
                        skip_fields=skip_fields, new_field_values=field_values)
 

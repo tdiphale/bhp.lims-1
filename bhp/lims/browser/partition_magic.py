@@ -33,6 +33,7 @@ PARTITION_SKIP_FIELDS = [
     "id",
     "modification_date",
     "ParentAnalysisRequest",
+    "PrimaryAnalysisRequest"
 ]
 
 
@@ -87,13 +88,17 @@ class PartitionMagicView(BrowserView):
                 logger.info("Successfully created partition: {}".format(
                     api.get_path(partition)))
 
+                # Force the reception of the partition
                 force_receive(partition)
 
             message = _("Created {} partitions: {}".format(
                 len(partitions), ", ".join(map(api.get_title, partitions))))
 
-
-            return self.redirect(message=message)
+            # Redirect to the printing view
+            uids = ','.join(map(lambda part: api.get_uid(part), partitions))
+            url = "{}{}".format(self.context.absolute_url(),
+                                '/print_view?uids='+uids)
+            return self.request.response.redirect(url)
 
         # Handle cancel
         if form_submitted and form_cancel:
@@ -233,6 +238,7 @@ class PartitionMagicView(BrowserView):
         """
         info = None
         template = ar.getTemplate()
+        ar_sampletype_uid = api.get_uid(ar.getSampleType())
 
         if template:
             info = self.get_base_info(template)
@@ -245,31 +251,41 @@ class PartitionMagicView(BrowserView):
             for partition, service_uid in partition_analyses:
                 analyses_by_partition[partition].append(service_uid)
 
+            sampletypes_by_partition = defaultdict(list)
+            for part in template.getPartitions():
+                part_id = part.get("part_id")
+                sampletype_uid = part.get('sampletype_uid', ar_sampletype_uid)
+                sampletypes_by_partition[part_id] = sampletype_uid
+
             partitions = map(lambda p: p.get("part_id"),
                              template.getPartitions())
             info.update({
                 "analyses": analyses_by_partition,
                 "partitions": partitions,
+                "sample_types": sampletypes_by_partition,
             })
         else:
             info = {
                 "analyses": [],
                 "partitions": [],
+                "sample_types": [],
             }
         return info
 
     def get_number_of_partitions_for(self, ar):
         """Return the number of selected partitions
         """
-        template = ar.getTemplate()
-        # get the number of partitions from the template
-        if template:
-            num = len(template.getPartitions())
-        else:
-            # fetch the number of partitions from the request
-            uid = api.get_uid(ar)
-            num = self.request.get("primary", {}).get(
-                uid, DEFAULT_NUMBER_OF_PARTITIONS)
+        # fetch the number of partitions from the request
+        uid = api.get_uid(ar)
+        num = self.request.get("primary", {}).get(uid)
+
+        if num is None:
+            # get the number of partitions from the template
+            template = ar.getTemplate()
+            if template:
+                num = len(template.getPartitions())
+            else:
+                num = DEFAULT_NUMBER_OF_PARTITIONS
         try:
             num = int(num)
         except (TypeError, ValueError):

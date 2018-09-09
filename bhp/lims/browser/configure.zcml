@@ -100,6 +100,14 @@
       layer="bhp.lims.interfaces.IBhpLIMS"
   />
 
+  <browser:page
+      for="*"
+      name="print_view"
+      class=".generate_barcodes.GenerateBarcodesView"
+      permission="zope2.View"
+      layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
   <!-- Corier Shipment View -->
   <browser:page
       for="*"
@@ -114,6 +122,14 @@
       name="bhp.lims.static"
       directory="static"
       layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
+  <browser:page
+      for="*"
+      name="getsampletypes"
+      class=".sampletype.ajaxGetSampleTypes"
+      permission="zope.Public"
+      layer="bika.lims.interfaces.IBikaLIMS"
   />
 
 </configure>

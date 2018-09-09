@@ -120,6 +120,9 @@ def setupHandler(context):
     # Setup printer stickers
     setup_printer_stickers(portal)
 
+    # Migrate wrongly partitioned ARs
+    move_parent_to_primary_analysisrequest(portal)
+
     logger.info("BHP setup handler [DONE]")
 
 
@@ -798,3 +801,28 @@ def setup_catalogs(portal):
             logger.info("*** Column '%s' already in catalog '%s'  [SKIP]"
                         % (name, catalog))
             continue
+
+
+def move_parent_to_primary_analysisrequest(portal):
+    """The field to be used for storing the relationship between
+    Partition (as AR) and their parent Analysis Request has been changed
+    to PrimaryAnalysisRequest cause the field is already in use for
+    retractions
+    """
+    logger.info("*** Moving partitions from parent to primary ***")
+    query = dict(portal_type="AnalysisRequest")
+    brains = api.search(query, CATALOG_ANALYSIS_REQUEST_LISTING)
+    for ar in brains:
+        ar = api.get_object(ar)
+        parent = ar.getParentAnalysisRequest()
+        if not parent or api.get_review_status(parent) == "invalid":
+            # Does not have a parent assigned or is a retraction.
+            continue
+
+        # Is a partition?
+        if ar.getPrimarySample() == parent.getSample():
+            ar.Schema().getField("PrimaryAnalysisRequest").set(ar, parent)
+            ar.setParentAnalysisRequest(None)
+            parent.setChildAnalysisRequest(None)
+
+

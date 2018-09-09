@@ -39,6 +39,24 @@
     replacement=".browser.analysisrequest.add2.flush"
   />
 
+  <!-- Primary Sample-->
+  <monkey:patch
+    description=""
+    class="bika.lims.content.analysisrequest.AnalysisRequest"
+    original="getPrimarySample"
+    ignoreOriginal="True"
+    replacement=".content.analysisrequest.getPrimarySample"
+  />
+
+  <!-- Primary Analysis Request-->
+  <monkey:patch
+    description=""
+    class="bika.lims.content.analysisrequest.AnalysisRequest"
+    original="getPrimaryAnalysisRequest"
+    ignoreOriginal="True"
+    replacement=".content.analysisrequest.getPrimaryAnalysisRequest"
+  />
+
   <!-- Analysis Requests ancestors -->
   <monkey:patch
     description=""

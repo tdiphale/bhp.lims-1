@@ -6,6 +6,7 @@
 from Products.Archetypes.Widget import BooleanWidget
 from Products.Archetypes.public import StringWidget
 from Products.Archetypes.public import TextAreaWidget
+from Products.Archetypes.references import HoldingReference
 from Products.CMFCore.permissions import ModifyPortalContent, View
 from archetypes.schemaextender.interfaces import IOrderableSchemaExtender
 from archetypes.schemaextender.interfaces import ISchemaModifier
@@ -15,7 +16,7 @@ from bika.lims.browser.fields.proxyfield import ExtProxyField
 from bika.lims.browser.widgets import DateTimeWidget
 from bika.lims.browser.widgets import SelectionWidget
 from bika.lims.browser.widgets.referencewidget import ReferenceWidget
-from bika.lims.fields import ExtBooleanField
+from bika.lims.fields import ExtBooleanField, ExtReferenceField
 from bika.lims.interfaces import IAnalysisRequest
 from zope.component import adapts
 from zope.interface import implements
@@ -268,6 +269,18 @@ class AnalysisRequestSchemaExtender(object):
                 catalog_name='bika_catalog',
                 base_query={'review_state': 'active'},
                 showOn=False,
+            ),
+        ),
+        ExtReferenceField(
+            'PrimaryAnalysisRequest',
+            allowed_types=('AnalysisRequest',),
+            relationship='AnalysisRequestPrimaryAnalysisRequest',
+            referenceClass=HoldingReference,
+            mode="rw",
+            read_permission=View,
+            write_permission=ModifyPortalContent,
+            widget=ReferenceWidget(
+                visible=False,
             ),
         ),
     ]
