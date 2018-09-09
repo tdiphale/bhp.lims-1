@@ -237,6 +237,7 @@ class PartitionMagicView(BrowserView):
         """
         info = None
         template = ar.getTemplate()
+        ar_sampletype_uid = api.get_uid(ar.getSampleType())
 
         if template:
             info = self.get_base_info(template)
@@ -249,16 +250,24 @@ class PartitionMagicView(BrowserView):
             for partition, service_uid in partition_analyses:
                 analyses_by_partition[partition].append(service_uid)
 
+            sampletypes_by_partition = defaultdict(list)
+            for part in template.getPartitions():
+                part_id = part.get("part_id")
+                sampletype_uid = part.get('sampletype_uid', ar_sampletype_uid)
+                sampletypes_by_partition[part_id] = sampletype_uid
+
             partitions = map(lambda p: p.get("part_id"),
                              template.getPartitions())
             info.update({
                 "analyses": analyses_by_partition,
                 "partitions": partitions,
+                "sample_types": sampletypes_by_partition,
             })
         else:
             info = {
                 "analyses": [],
                 "partitions": [],
+                "sample_types": [],
             }
         return info
 

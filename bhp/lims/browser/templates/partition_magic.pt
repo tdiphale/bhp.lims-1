@@ -130,9 +130,10 @@
                           <div class="form-group">
                             <select name="partitions.sampletype_uid:records" class="form-control">
                               <tal:options repeat="sampletype view/get_sampletype_data"
-                                          define="ar_sampletype_uid ar/sampletype/uid">
+                                          define="ar_sampletype_uid ar/sampletype/uid;
+                                                  part_sampletype_uid python:template.get('sample_types', {}).get(partition, ar_sampletype_uid);">
                                 <option tal:attributes="value sampletype/uid;
-                                                        selected python:sampletype.get('uid') == ar_sampletype_uid and 'selected' or ''"
+                                                        selected python:sampletype.get('uid') == part_sampletype_uid"
                                         tal:content="sampletype/title">
                                   Sample Type
                                 </option>
