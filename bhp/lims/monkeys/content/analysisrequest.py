@@ -27,5 +27,10 @@ def getDescendants(self, all_descendants=True):
         descendants += child.getDescendants()
     return descendants
 
+
+def getPrimarySample(self):
+    return api.get_field_value(self, "PrimarySample", None)
+
+
 def getPrimaryAnalysisRequest(self):
     return api.get_field_value(self, "PrimaryAnalysisRequest", None)
