@@ -2,7 +2,8 @@
   i18n:domain="bhp.lims"
   define="model python:view.model;
           accredited_symbol string:★;
-          outofrange_symbol string:⚠;">
+          outofrange_symbol string:⚠;
+          json modules/json;">
 
   <tal:css define="laboratory view/laboratory;">
     <style type="text/css">
@@ -417,21 +418,11 @@
                       <span tal:content="python:'(RT)' if model.is_retested(analysis) else ''"></span>
                       <span tal:content="python:model.get_formatted_specs(analysis)">50 - 60</span>
                     </td>
-                    <td class="text-center align-middle graphrange"
-                        tal:define="rr analysis/getResultsRange;
-                            min python: str(rr.get('min',0)).replace(',','.');
-                            min python: min if min else 0;
-                            max python: str(rr.get('max',0)).replace(',','.');
-                            max python: max if max else 0;
-                            err python: str(rr.get('error',0)).replace(',','.');
-                            err python: err if err else 0;
-                            res python: str(analysis.getResult()).replace(',','.');
-                            res python: res if res else 0;
-                            dataspecs python: '[%s,%s,%s,%s]' % (res,min,max,err);">
+                    <td class="text-center align-middle graphrange">
                       <div class="range-chart"
                            style="width:150px;"
-                           tal:attributes="data-specs python:dataspecs"
-                           tal:condition="python: max > min"></div>
+                           tal:attributes="data-range python: json.dumps(analysis.getResultsRange());
+                                           data-result python: analysis.getResult();"></div>
                     </td>
                   </tr>
                 </tal:analyses>
