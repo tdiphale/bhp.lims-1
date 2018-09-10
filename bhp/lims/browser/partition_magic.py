@@ -118,6 +118,7 @@ class PartitionMagicView(BrowserView):
         record = {
             "PrimarySample": api.get_uid(sample),
             "InternalUse": True,
+            "PrimaryAnalysisRequest": primary_uid,
             "SampleType": sampletype_uid,
         }
 
