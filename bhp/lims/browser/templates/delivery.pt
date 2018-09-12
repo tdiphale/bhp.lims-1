@@ -206,7 +206,8 @@
             </div>
           </td>
           <td tal:content="python: analysisrequest.getPriority()"></td>
-          <td tal:content="python: view.get(analysisrequest, 'Template').Title()"></td>
+          <td tal:define="template python: view.get(analysisrequest,'Template')"
+              tal:content="python: template and template.Title() or ''"></td>
           <td>
               <span tal:content="python: view.get(analysisrequest, 'ParticipantID')"></span>
           </td>

@@ -3,7 +3,7 @@ Changelog
 
 1.0.0 (unreleased)
 ------------------
-
+- #134 Traceback on delivery report generation when no Template assigned to AR
 - #52 Analysis request has to allow selecting a container type for a sample
 - #24 Auto-print stickers on register
 - #14 Date Sampled -> Date Time Sampled
