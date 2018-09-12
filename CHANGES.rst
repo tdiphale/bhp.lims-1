@@ -4,6 +4,7 @@ Changelog
 1.0.0 (unreleased)
 ------------------
 
+- #135 Allow to set specifications by default per Sample Type
 - #139 Traceback on partitioning preview
 - #140 Do not display "hidden" analyses in requisition report
 - #134 Traceback on delivery report generation when no Template assigned to AR

@@ -12,6 +12,9 @@
     <adapter factory=".sample.SampleSchemaExtender" />
     <adapter factory=".sample.SampleSchemaModifier" />
 
+    <!-- SampleType -->
+    <adapter factory=".sampletype.SampleTypeSchemaExtender" />
+
     <!-- Client -->
     <adapter factory=".client.ClientSchemaModifier" />
 

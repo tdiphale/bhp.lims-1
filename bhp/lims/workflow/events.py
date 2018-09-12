@@ -59,12 +59,19 @@ def after_no_sampling_workflow(obj):
         generate_requisition_pdf(obj)
 
         # Set specifications by default
-        sample_type = obj.getSampleType().Title()
-        specs_title = "{} - calculated".format(sample_type)
-        query = dict(portal_type="AnalysisSpec", title=specs_title)
-        specs = api.search(query, 'bika_setup_catalog')
+        sample_type = obj.getSampleType()
+        specs = _api.get_field_value(sample_type,
+                                     "DefaultAnalysisSpecifications", None)
         if specs:
-            obj.setSpecification(api.get_object(specs[0]))
+            obj.setSpecification(api.get_object(specs))
+        else:
+            # Find out suitable specs by Sample Type name
+            sample_type = obj.getSampleType().Title()
+            specs_title = "{} - calculated".format(sample_type)
+            query = dict(portal_type="AnalysisSpec", title=specs_title)
+            specs = api.search(query, 'bika_setup_catalog')
+            if specs:
+                obj.setSpecification(api.get_object(specs[0]))
 
     elif ISample.providedBy(obj):
         sample_events._cascade_transition(obj, 'no_sampling_workflow')
