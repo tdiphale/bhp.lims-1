@@ -3,6 +3,8 @@ Changelog
 
 1.0.0 (unreleased)
 ------------------
+
+- #140 Do not display "hidden" analyses in requisition report
 - #134 Traceback on delivery report generation when no Template assigned to AR
 - #52 Analysis request has to allow selecting a container type for a sample
 - #24 Auto-print stickers on register
