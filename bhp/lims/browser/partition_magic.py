@@ -267,9 +267,9 @@ class PartitionMagicView(BrowserView):
             })
         else:
             info = {
-                "analyses": [],
+                "analyses": {},
                 "partitions": [],
-                "sample_types": [],
+                "sample_types": {},
             }
         return info
 
