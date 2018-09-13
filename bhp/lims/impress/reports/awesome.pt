@@ -3,7 +3,9 @@
   define="model python:view.model;
           accredited_symbol string:★;
           outofrange_symbol string:⚠;
-          json modules/json;">
+          json modules/json;
+          DateTime python:modules['DateTime'].DateTime;
+          date_published python:DateTime()">
 
   <tal:css define="laboratory view/laboratory;">
     <style type="text/css">
@@ -118,7 +120,7 @@
             <td class="center small">
               <div class="small">
                 <span class="iphen-after">M18.07</span>
-                <span tal:content="python:view.to_localized_time(model.DatePublished, long_format=False)"></span>
+                <span tal:content="python:view.to_localized_time(date_published, long_format=False)"></span>
               </div>
               <div class="barcode"
                     data-code='code128'
@@ -324,7 +326,7 @@
             <td class="cell-spacing"></td>
             <td class="font-weight-bold">Date Published</td>
             <td class="value">
-                <span tal:content="python:view.to_localized_time(model.DatePublished, long_format=False)"></span>
+                <span tal:content="python:view.to_localized_time(date_published, long_format=False)"></span>
             </td>
           </tr>
           <tr>
