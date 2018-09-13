@@ -4,6 +4,7 @@ Changelog
 1.0.0 (unreleased)
 ------------------
 
+- #146 Primary Analysis Request does not transition to "To be verified" automatically
 - #144 Do not create partitions without analyses
 - #144 Exit gracefully when no partitions are selected in Partition Magic
 - #142 Unbind results ranges from Sample Types

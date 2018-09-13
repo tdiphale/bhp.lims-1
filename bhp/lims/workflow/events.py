@@ -160,7 +160,7 @@ def after_receive(obj):
 
 
 def after_submit(obj):
-    """Event fired after receive (Process) transition is triggered
+    """Event fired after submit transition is triggered
     """
     logger.info("*** Custom after_submit transition ***")
     if IAnalysis.providedBy(obj) or IDuplicateAnalysis.providedBy(obj):

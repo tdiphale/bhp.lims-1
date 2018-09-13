@@ -472,6 +472,16 @@ def setup_bhp_workflow_for(portal, workflow_id):
     workflow.transitions.receive.title="Receive at point of testing"
     workflow.transitions.receive.actbox_name = "Receive at point of testing"
 
+    # Override guards
+    submit_transition = workflow.transitions.get('submit', None)
+    if submit_transition:
+        guard_submit = submit_transition.guard or Guard()
+        guard_props = {'guard_permissions': '',
+                       'guard_roles': '',
+                       'guard_expr': 'python:here.guard_submit()'}
+        guard_submit.changeFromProperties(guard_props)
+        submit_transition.guard = guard_submit
+
 
 def update_role_mappings(obj_or_brain, wfs=None, reindex=True):
     """Update the role mappings of the given object
