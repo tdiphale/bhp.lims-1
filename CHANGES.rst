@@ -4,6 +4,7 @@ Changelog
 1.0.0 (unreleased)
 ------------------
 
+- #147 Newly added Couriers are not displayed in Analysis Request Add form
 - #146 Primary Analysis Request does not transition to "To be verified" automatically
 - #144 Do not create partitions without analyses
 - #144 Exit gracefully when no partitions are selected in Partition Magic

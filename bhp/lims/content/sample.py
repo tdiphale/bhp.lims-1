@@ -202,7 +202,7 @@ class SampleSchemaExtender(object):
                     'invalid':           {'view': 'visible', 'edit': 'invisible'},
                     'rejected':          {'view': 'visible', 'edit': 'invisible'},
                 },
-                catalog_name='portal_catalog',
+                catalog_name='bika_setup_catalog',
                 base_query={'review_state': 'active'},
                 showOn=True,
             )

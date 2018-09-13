@@ -22,7 +22,7 @@ class CourierFolderContentsView(BikaListingView):
     def __init__(self, context, request):
         super(CourierFolderContentsView, self).__init__(context, request)
 
-        self.catalog = "portal_catalog"
+        self.catalog = "bika_setup_catalog"
 
         self.contentFilter = {
             "portal_type": "Courier",
