@@ -50,32 +50,25 @@ def get_specification_for(spec, default=_marker):
             return default
         api.fail("Specification not set for request {}".format(request.id))
 
-    sample_type = specification.getSampleTypeTitle()
-    if not sample_type:
-        if default is not _marker:
-            return default
-        api.fail("Sample Type not defined for specification {}".format(
-            specification.Title()))
-
     years, months, days = _api.get_age(dob, sampled)
     return get_analysisspec(analysis_keyword=analysis.getKeyword(),
-                             sample_type=sample_type, gender=gender,
-                             years=years, months=months, days=days)
+                            gender=gender, years=years, months=months,
+                            days=days)
 
 
-def get_analysisspec(analysis_keyword, sample_type, gender, years, months, days):
+def get_analysisspec(analysis_keyword, gender, years, months, days):
     """Returns a plain dictionary with specification values (min, max, etc.)
     that better suit with the parameters passed in.
 
-    >>> specs = get_analysisspec("Cu", "Whole blood", "m", 0, 1, 0)
+    >>> specs = get_analysisspec("Cu", "m", 0, 1, 0)
     >>> ' '.join([specs['min'], specs['max'], specs['minpanic'], specs['maxpanic'])
     10 20 5 25
 
-    >>> specs = get_analysisspec("Cu", "Whole blood", "f", 0, 5, 0)
+    >>> specs = get_analysisspec("Cu", "f", 0, 5, 0)
     >>> ' '.join([specs['min'], specs['max'], specs['minpanic'], specs['maxpanic'])
     20 30 15 35
 
-    >>> specs = get_analysisspec("Cu", "Whole blood", "a", 0, 5, 0)
+    >>> specs = get_analysisspec("Cu", "a", 0, 5, 0)
     >>> ' '.join([specs['min'], specs['max'], specs['minpanic'], specs['maxpanic'])
     30 40 25 45
     """
@@ -88,8 +81,6 @@ def get_analysisspec(analysis_keyword, sample_type, gender, years, months, days)
     num_age = to_number(years, months, days)
     for spec in get_xls_specifications():
         if spec.get('keyword', None) != analysis_keyword:
-            continue
-        if spec.get('sample_type', None) != sample_type:
             continue
         sgender = spec.get('gender', 'mf')
         if gender not in sgender:

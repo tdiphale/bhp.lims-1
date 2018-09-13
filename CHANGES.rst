@@ -3,6 +3,8 @@ Changelog
 
 1.0.0 (unreleased)
 ------------------
+
+- #142 Unbind results ranges from Sample Types
 - #141 Participant initials field in analysis request must allow more than 2 initials to be entered
 - #135 Allow to set specifications by default per Sample Type
 - #139 Traceback on partitioning preview
