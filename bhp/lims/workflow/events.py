@@ -14,6 +14,7 @@ from bika.lims.utils.samplepartition import create_samplepartition
 from bika.lims.workflow import doActionFor
 from bika.lims.workflow.sample import events as sample_events
 from bika.lims.workflow.analysis import events as analysis_events
+from DateTime import DateTime
 
 
 def _promote_transition(obj, transition_id):
@@ -103,8 +104,11 @@ def after_deliver(obj):
         sample = obj.getSample()
         if sample:
             doActionFor(sample, 'deliver')
+        obj.reindexObject(idxs=["getDateReceived", ])
 
     elif ISample.providedBy(obj):
+        obj.setDateReceived(DateTime())
+        obj.reindexObject(idxs=["getDateReceived", ])
         sample_events._cascade_transition(obj, 'deliver')
 
 
