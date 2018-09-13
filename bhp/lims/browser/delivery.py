@@ -54,7 +54,6 @@ class DeliveryFormPdf(BrowserView):
         img_str = img.read()
         return "data:image/png;base64,{}".format(b64encode(img_str))
 
-
 def generate_delivery_pdf(context, ars_or_samples):
     if not ars_or_samples:
         logger.warn("No Analysis Requests or Samples provided")

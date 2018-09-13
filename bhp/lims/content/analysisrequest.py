@@ -72,7 +72,7 @@ class AnalysisRequestSchemaExtender(object):
             required=1,
             widget=StringWidget(
                 label=_("Participant Initials"),
-                maxlength=2,
+                maxlength=3,
                 size=2,
                 render_own_label=True,
                 visible={'edit': 'visible',

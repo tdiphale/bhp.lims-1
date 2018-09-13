@@ -3,7 +3,7 @@ Changelog
 
 1.0.0 (unreleased)
 ------------------
-
+- #141 Participant initials field in analysis request must allow more than 2 initials to be entered
 - #135 Allow to set specifications by default per Sample Type
 - #139 Traceback on partitioning preview
 - #140 Do not display "hidden" analyses in requisition report
