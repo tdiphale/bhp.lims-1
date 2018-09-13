@@ -81,6 +81,9 @@ class PartitionMagicView(BrowserView):
                 primary_uid = partition.get("primary_uid")
                 sampletype_uid = partition.get("sampletype_uid")
                 analyses_uids = partition.get("analyses")
+                if not analyses_uids or not primary_uid:
+                    # Cannot create a partition w/o analyses!
+                    continue
 
                 partition = self.create_partition(
                     primary_uid, sampletype_uid, analyses_uids)
