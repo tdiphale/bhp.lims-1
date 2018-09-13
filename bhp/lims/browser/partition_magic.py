@@ -77,10 +77,13 @@ class PartitionMagicView(BrowserView):
             partitions = []
 
             # create the partitions
-            for partition in form.get("partitions"):
+            for partition in form.get("partitions", []):
                 primary_uid = partition.get("primary_uid")
                 sampletype_uid = partition.get("sampletype_uid")
                 analyses_uids = partition.get("analyses")
+                if not analyses_uids or not primary_uid:
+                    # Cannot create a partition w/o analyses!
+                    continue
 
                 partition = self.create_partition(
                     primary_uid, sampletype_uid, analyses_uids)
@@ -90,6 +93,10 @@ class PartitionMagicView(BrowserView):
 
                 # Force the reception of the partition
                 force_receive(partition)
+
+            if not partitions:
+                # If no partitions were created, show a warning message
+                return self.redirect(message=_("No partitions were created"))
 
             message = _("Created {} partitions: {}".format(
                 len(partitions), ", ".join(map(api.get_title, partitions))))

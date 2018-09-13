@@ -4,6 +4,8 @@ Changelog
 1.0.0 (unreleased)
 ------------------
 
+- #144 Do not create partitions without analyses
+- #144 Exit gracefully when no partitions are selected in Partition Magic
 - #142 Unbind results ranges from Sample Types
 - #141 Participant initials field in analysis request must allow more than 2 initials to be entered
 - #135 Allow to set specifications by default per Sample Type
