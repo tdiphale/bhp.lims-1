@@ -156,6 +156,7 @@ class PartitionMagicView(BrowserView):
             analyses=services,
             specifications=self.get_specifications_for(ar)
         )
+        ar.Schema().getField("InternalUse").set(ar, True)
         return ar
 
     def get_specifications_for(self, ar):
