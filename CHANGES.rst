@@ -4,6 +4,7 @@ Changelog
 1.0.0 (unreleased)
 ------------------
 
+- #150 Make partitions more visible in listings
 - #149 Date Published is empty in results report
 - #148 Date sample received value is not appearing in service report
 - #147 Newly added Couriers are not displayed in Analysis Request Add form

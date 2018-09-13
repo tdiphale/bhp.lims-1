@@ -58,10 +58,14 @@ def init_listing(listing):
 
 def folder_listing_item(listing, obj, item, index):
     ar = api.get_object(obj)
-    primary = _api.get_field_value(ar, 'PrimarySample', None) or ar.getSample()
-    primary = api.get_object(primary)
-    primary_id = primary.getSampleID()
-    primary_url = primary.absolute_url()
-    item["primary"] = primary.getSampleID()
-    item["replace"]["primary"] = get_link(primary_url, value=primary_id)
+    primary = ar.getPrimaryAnalysisRequest()
+    if primary:
+        primary = api.get_object(primary)
+        primary_id = primary.getId()
+        primary_url = primary.absolute_url()
+        item["primary"] = primary_id
+        item["replace"]["primary"] = get_link(primary_url, value=primary_id)
+        item["before"]["getId"] = "···"
+    else:
+        item["primary"] = ""
     return item
