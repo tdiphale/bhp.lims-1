@@ -4,6 +4,7 @@ Changelog
 1.0.0 (unreleased)
 ------------------
 
+- #153 Primary is not transitioning automatically to Verified state
 - #151 Make partitions not visible by default to clinics
 - #150 Make partitions more visible in listings
 - #149 Date Published is empty in results report

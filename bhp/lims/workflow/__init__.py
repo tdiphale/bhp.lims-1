@@ -94,15 +94,16 @@ class SampleARWorkflowAction(BaseAnalysisRequestWorkflowAction):
                 last_requisition_attachment = attachment
         return last_requisition_attachment
 
+
 class SampleWorkflowAction(SampleARWorkflowAction):
     """Workflow action button clicked inside Sample"""
     pass
+
 
 class AnalysisRequestWorkflowAction(SampleARWorkflowAction):
     """ Workflow action button clicked inside Analysis Request
     """
     pass
-
 
 
 class SamplesWorkflowAction(ClientWorkflowAction):

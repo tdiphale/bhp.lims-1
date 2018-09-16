@@ -178,7 +178,7 @@ def after_verify(obj):
     """Event fired after receive (Process) transition is triggered
     """
     logger.info("*** Custom after_verify transition ***")
-    if IAnalysis.providedBy(obj):
+    if IAnalysis.providedBy(obj) or IDuplicateAnalysis.providedBy(obj):
         analysis_events.after_verify(obj)
 
     if IAnalysisRequest.providedBy(obj):
