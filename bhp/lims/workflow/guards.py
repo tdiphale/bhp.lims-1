@@ -84,6 +84,11 @@ def guard_process(context):
     if sample.Schema()['PrimarySample'].get(sample):
         return False
 
+    # If the current user is a Client contact, do not allow to deliver
+    user = api.get_current_user()
+    if "Client" in user.getRoles():
+        return False
+
     return True
 
 
@@ -91,7 +96,15 @@ def guard_process(context):
 def guard_send_to_pot(context):
     """Guard for sending the sample to the point of testing
     """
-    return api.is_active(context)
+    if not api.is_active(context):
+        return False
+
+    # If the current user is a Client contact, do not allow to deliver
+    user = api.get_current_user()
+    if "Client" in user.getRoles():
+        return False
+
+    return True
 
 
 @security.public

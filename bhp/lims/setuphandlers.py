@@ -13,7 +13,6 @@ from bhp.lims import bhpMessageFactory as _
 from bhp.lims import logger
 from bhp.lims.specscalculations import get_xls_specifications
 from bika.lims import api
-from bika.lims.catalog.analysis_catalog import CATALOG_ANALYSIS_LISTING
 from bika.lims.catalog.analysisrequest_catalog import \
     CATALOG_ANALYSIS_REQUEST_LISTING
 from bika.lims.idserver import renameAfterCreation
@@ -353,7 +352,7 @@ def setup_bhp_workflow_for(portal, workflow_id):
     sample_ordered.setPermission(PreserveSample, False, ())
     sample_ordered.setPermission(ReceiveSample, False, ())
     sample_ordered.setPermission(ScheduleSampling, False, ())
-    sample_ordered.transitions = ('send_to_lab', 'reject')
+    sample_ordered.transitions = ('send_to_lab',)
     workflow.transitions.no_sampling_workflow.new_state_id = 'sample_ordered'
 
     # Shipped: Clinic sent the sample --[send_to_lab]--> sample_shipped
@@ -373,7 +372,7 @@ def setup_bhp_workflow_for(portal, workflow_id):
     sample_shipped.setPermission(PreserveSample, False, ())
     sample_shipped.setPermission(ReceiveSample, False, ())
     sample_shipped.setPermission(ScheduleSampling, False, ())
-    sample_shipped.transitions = ('deliver', 'reject')
+    sample_shipped.transitions = ('deliver',)
 
     # At reception: Sample is delivered --[deliver]--> sample_at_reception
     at_reception = workflow.states.get('sample_at_reception')
