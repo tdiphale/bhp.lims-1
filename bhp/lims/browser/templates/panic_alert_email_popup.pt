@@ -1,0 +1,71 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      i18n:domain="bhp">
+  <head>
+    <style>/*
+        div.fieldline {
+            margin-bottom:5px;
+            clear:both;
+        }
+        div.fieldline div.fieldline-label,
+        div.fieldline div.fieldline-content {
+            float:left;
+        }
+        div.fieldline div.fieldline-label {
+            width:80px;
+        }
+        div.fieldline div.fieldline-content {
+        }
+        div.clear-both {
+            clear:both;
+        }*/
+    </style>
+  </head>
+  <body>
+
+    <h1>
+      <img tal:condition="view/icon | nothing" src="" tal:attributes="src view/icon"/>
+      <span i18n:translate="">Alert clinic</span>
+    </h1>
+
+    <p i18n:translate="">
+        Some values exceeded the panic levels. Send an email to the
+        clinic or close this window if you want to re-test to confirm the
+        panic value.
+    </p>
+
+    <form id="analysisrequest_email_form"
+          name="analysisrequest_email_form"
+          method="POST"
+          enctype="multipart/form-data"
+          tal:define="recipients view/recipients;">
+
+      <div class="form-group">
+        <label for="subject" i18n:translate="">Subject</label>
+        <input type="text" class="form-control required"
+                tal:attributes="id string:subject;
+                                name string:subject;
+                                value view/subject;
+                                size string:35;"/>
+      </div>
+      <div class="form-group">
+        <label for="to" i18n:translate="">To</label>
+        <input type="text" class="form-control required"
+               aria-describedby="emailHelp"
+                 tal:attributes="id string:to;
+                                 name string:to;
+                                 value view/getFormattedRecipients;
+                                 size string:35;"/>
+      </div>
+      <div class="form-group">
+        <label for="body" i18n:translate="">Body</label>
+        <textarea class="form-control required" name="email_body"
+                  id="email_body"
+                tal:content="view/body" cols="42" rows="8"></textarea>
+      </div>
+      <input class="btn btn-primary"
+             type="submit" value="Send" name="email_popup_submit"
+             id="email_popup_submit">
+    </form>
+</body>
+</html>

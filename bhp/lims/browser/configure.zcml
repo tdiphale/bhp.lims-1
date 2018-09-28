@@ -117,6 +117,69 @@
       layer="bhp.lims.interfaces.IBhpLIMS"
   />
 
+  <!-- Show Panic Level Alert viewlet -->
+  <browser:viewlet
+    for="bika.lims.interfaces.IAnalysisRequest"
+    name=".panic_alert_viewlet"
+    class=".viewlets.PanicAlertViewlet"
+    manager="plone.app.layout.viewlets.interfaces.IAboveContent"
+    template="templates/panic_alert_viewlet.pt"
+    permission="bika.lims.ManageAnalysisRequests"
+    layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
+  <!-- Override AR's views to manage Panic Level Email -->
+  <browser:page
+    for="bika.lims.interfaces.IAnalysisRequest"
+    name="base_view"
+    class=".analysisrequest.AnalysisRequestView"
+    permission="bika.lims.ManageAnalysisRequests"
+    layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+  <browser:page
+    for="bika.lims.interfaces.IAnalysisRequest"
+    name="analyses"
+    class=".analysisrequest.AnalysisRequestAnalysesView"
+    permission="bika.lims.permissions.AddAnalysis"
+    layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+  <browser:page
+    for="bika.lims.interfaces.IAnalysisRequest"
+    name="manage_results"
+    class=".analysisrequest.AnalysisRequestManageResultsView"
+    permission="bika.lims.EditResults"
+    layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+  <browser:page
+    for="bika.lims.interfaces.IAnalysisRequest"
+    name="not_requested"
+    class=".analysisrequest.AnalysisRequestResultsNotRequestedView"
+    permission="bika.lims.ManageAnalysisRequests"
+    layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+  <browser:page
+    for="bika.lims.interfaces.IAnalysisRequest"
+    name="published_results"
+    class=".analysisrequest.AnalysisRequestPublishedResultsView"
+    permission="bika.lims.ManageAnalysisRequests"
+    layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+  <browser:page
+    for="bika.lims.interfaces.IAnalysisRequest"
+    name="log"
+    class=".analysisrequest.AnalysisRequestLogView"
+    permission="bika.lims.ManageAnalysisRequests"
+    layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
+  <browser:page
+    for="*"
+    name="email_popup"
+    class=".panic_alert_email_popup.EmailPopupView"
+    permission="zope.Public"
+    layer="bhp.lims.interfaces.IBhpLIMS"
+  />
+
   <!-- Register static directory for JS/CSS/Image resources -->
   <browser:resourceDirectory
       name="bhp.lims.static"

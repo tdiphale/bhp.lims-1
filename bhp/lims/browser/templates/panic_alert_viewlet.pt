@@ -1,0 +1,31 @@
+<div tal:omit-tag=""
+     tal:condition="python:view.in_panic"
+     i18n:domain="bhp.lims">
+
+  <div class="visualClear"></div>
+
+  <div id="portal-alert">
+    <div class="portlet-alert-item alert alert-warning alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <strong>Warning</strong>
+      <p class="title">
+        <span i18n:translate="">Some results exceeded the panic levels that
+          may indicate an imminent life-threatening condition.</span>&nbsp;
+        <span tal:condition="python: view.panic_email_sent">
+          An email alert has been sent already.
+        </span>
+      </p>
+      <p>
+        <a href="#" id="email_popup"
+           tal:attributes="class python: view.panic_email_sent and 'btn btn-warning' or 'btn btn-danger'"
+           i18n:translate="">Alert clinic about panic levels exceeded</a>
+        <input name="email_popup_uid" type="hidden" id="ar_uid"
+               tal:attributes="autoshow python: not view.panic_email_sent;
+                               value python: view.ar_uid"></input>
+
+      </p>
+    </div>
+  </div>
+</div>

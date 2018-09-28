@@ -65,6 +65,9 @@ PRINTERS = {
         },
     }
 
+PROFILE_STEPS = [
+    "jsregistry",
+]
 
 def setupHandler(context):
     """BHP setup handler
@@ -119,8 +122,8 @@ def setupHandler(context):
     # Setup printer stickers
     setup_printer_stickers(portal)
 
-    # Migrate wrongly partitioned ARs
-    move_parent_to_primary_analysisrequest(portal)
+    # Reimport additional steps from profile
+    import_profile_steps(portal)
 
     logger.info("BHP setup handler [DONE]")
 
@@ -811,27 +814,10 @@ def setup_catalogs(portal):
                         % (name, catalog))
             continue
 
-
-def move_parent_to_primary_analysisrequest(portal):
-    """The field to be used for storing the relationship between
-    Partition (as AR) and their parent Analysis Request has been changed
-    to PrimaryAnalysisRequest cause the field is already in use for
-    retractions
-    """
-    logger.info("*** Moving partitions from parent to primary ***")
-    query = dict(portal_type="AnalysisRequest")
-    brains = api.search(query, CATALOG_ANALYSIS_REQUEST_LISTING)
-    for ar in brains:
-        ar = api.get_object(ar)
-        parent = ar.getParentAnalysisRequest()
-        if not parent or api.get_review_status(parent) == "invalid":
-            # Does not have a parent assigned or is a retraction.
-            continue
-
-        # Is a partition?
-        if ar.getPrimarySample() == parent.getSample():
-            ar.Schema().getField("PrimaryAnalysisRequest").set(ar, parent)
-            ar.setParentAnalysisRequest(None)
-            parent.setChildAnalysisRequest(None)
-
-
+def import_profile_steps(portal):
+    logger.info("*** Importing profile steps...")
+    setup = portal.portal_setup
+    for step in PROFILE_STEPS:
+        logger.info("Importing profile step: {}".format(step))
+        setup.runImportStepFromProfile('profile-bhp.lims:default', step)
+    logger.info("*** Importing profile steps [DONE]")

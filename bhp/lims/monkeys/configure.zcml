@@ -75,6 +75,15 @@
     replacement=".content.analysisrequest.getDescendants"
   />
 
+  <!-- Analysis Request's has_analyses_in_panic -->
+  <monkey:patch
+    description=""
+    class="bika.lims.content.analysisrequest.AnalysisRequest"
+    original="has_analyses_in_panic"
+    ignoreOriginal="True"
+    replacement=".content.analysisrequest.has_analyses_in_panic"
+  />
+
   <!-- Mask analyses with those from descendants -->
   <monkey:patch
     description=""
