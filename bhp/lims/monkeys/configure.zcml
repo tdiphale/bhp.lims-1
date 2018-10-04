@@ -38,6 +38,13 @@
     original="flush"
     replacement=".browser.analysisrequest.add2.flush"
   />
+   <!-- Overriding the email body -->
+   <monkey:patch
+    description=""
+    class="bika.lims.browser.analysisrequest.workflow.AnalysisRequestWorkflowAction"
+    original="notify_ar_retract"
+    replacement=".browser.analysisrequest.workflow.notify_ar_retract"
+  />
 
   <!-- Primary Sample-->
   <monkey:patch

@@ -24,6 +24,23 @@ class BhpSingleReportView(SingleReportView):
         age = filter(lambda val: val != None, [years, months, days])
         return " ".join(age)
 
+    def get_analyses_by(self, model_or_collection,
+                        title=None, poc=None, category=None,
+                        hidden=False, retracted=False):
+        """Returns a sorted list of Analyses for the given POC which are in the
+        given Category
+        """
+        analyses = self.get_analyses(model_or_collection)
+        if title is not None:
+            analyses = filter(lambda an: an.Title() == title, analyses)
+        if poc is not None:
+            analyses = filter(lambda an: an.PointOfCapture == poc, analyses)
+        if category is not None:
+            analyses = filter(lambda an: an.Category == category, analyses)
+        if not hidden:
+            analyses = filter(lambda an: not an.Hidden, analyses)
+        return self.sort_items(analyses)
+
 
 class BhpMultiReportView(MultiReportView):
     """BHP specific controller view for multi-reports
