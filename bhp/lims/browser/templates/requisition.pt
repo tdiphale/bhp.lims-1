@@ -241,8 +241,8 @@
               <div>
               <tal:service tal:repeat="analysis python: analysisrequest.getAnalyses(full_objects=True)">
                 <div class="analysis"
-                     tal:condition="python: not analysis.getHidden()"
-                     tal:content="python: analysis.Title()" ></div>
+                     tal:condition="python: not analysis.getHidden() and view.get(analysis, 'Category') != 'Hematology'"
+                     tal:content="python: analysis.Title() + ' (' + analysis.Keyword+')'" ></div>
               </tal:service>
               </div>
             </div>
