@@ -312,16 +312,18 @@
   </tal:render>
 
   <!-- Results summary -->
-  <tal:render define="reporter python:view.current_user"
-              condition="reporter">
+  <tal:render define="reporter python:view.current_user;
+                      verifiers python:view.verifiers;"
+              condition="reporter and verifiers">
     <div class="row section-participant">
       <div class="col-sm-12">
         <h2>Results</h2>
         <table class="table table-sm">
           <tr>
-            <td class="font-weight-bold">Reviewed by</td>
+            <td class="font-weight-bold">Verified by</td>
             <td class="value">
-                <span tal:content="reporter/fullname"></span>
+                <span tal:define="verifiers python: map(lambda verifier: verifier.getFullname(), model.verifiers()"
+                      tal:content="python: ', '.join(verifiers)"></span>
             </td>
             <td class="cell-spacing"></td>
             <td class="font-weight-bold">Date Published</td>
@@ -330,7 +332,7 @@
             </td>
           </tr>
           <tr>
-              <td class="font-weight-bold">Released by</td>
+              <td class="font-weight-bold">Reviewed and Released by</td>
               <td class="value">
                   <span tal:content="reporter/fullname"></span>
               </td>
